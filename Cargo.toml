@@ -1,0 +1,11 @@
+[package]
+name = "campfire"
+version = "0.1.0"
+edition = "2018"
+authors = ["Jesse Lawson <jesse@lawsonry.com>"]
+description = "Build interactive content that compiles to a static site."
+
+[dependencies]
+pest = "2.1.3"
+pest_derive = "2.1.0"
+comrak = "0.10"
