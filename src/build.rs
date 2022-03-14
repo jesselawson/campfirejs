@@ -39,23 +39,21 @@ pub fn do_build() -> Result<(), boneserror::BonesError> {
   let mut cardslist:Vec<Card> = Vec::<Card>::new();
 
   parser::parse_campfire_file_as_string(&main_file_name, &main_file_as_string.unwrap(), &mut cardslist);
-
-  // Iterate through blockslists and compile shortcodes FIRST, as we want that content to 
-  // be handled before running through our commonmark parser
   
-  for card in cardslist.iter_mut().enumerate() {
-    let(_i,val):(usize, &mut Card) = card;
-    if !&val.name.as_ref().is_none() {
-      // TODO: Use pest to convert shortcodes to html via campfire-content-grammar.pest
-    }
-  } 
-
-  // Iterate through blockslist and compile HTML
+  // Convert to markdown
   for card in cardslist.iter_mut().enumerate() {
     let (_i,val):(usize, &mut Card) = card;
     if !&val.name.as_ref().is_none() { // If you don't check for this, you may get an error
                                        // while trying to .unwrap() a None (in the below param to markdown_to_html)
-      //val.set_compiled_body( comrak::markdown_to_html( &val.raw_body.as_ref().unwrap() , &comrak::ComrakOptions::default()) );
+      val.set_compiled_body( comrak::markdown_to_html( &val.raw_body.as_ref().unwrap() , &comrak::ComrakOptions::default()) );
+    }
+  }
+  
+  // Handle campfire expressions
+  for card in cardslist.iter_mut().enumerate() {
+    let(_i,val):(usize, &mut Card) = card;
+    if !&val.name.as_ref().is_none() {
+      // TODO: Use pest to convert shortcodes to html via campfire-content-grammar.pest
     }
   }
 

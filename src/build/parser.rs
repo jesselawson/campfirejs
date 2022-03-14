@@ -41,13 +41,10 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
                     }
                 }
             },
-            
             Rule::EOI => { },
             _ => { println!("Couldn't match {:?}", line.as_rule()) }
         }
     }
-
-    println!("{:#?}", card);
 
     cardslist.push(card);
 
