@@ -12,29 +12,59 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
         .expect("unsuccessful parse")
         .next().unwrap();
 
-    //println!("{:#?}", file);
+    println!("{:#?}", file);
 
-    for campfire_file_pair in file.into_inner() {
-        println!("New card");
+    let mut card = Card {
+        name: None,
+        source_filename: None,
+        raw_body: None,
+        compiled_body: None
+    };
 
-        let mut card = Card {
-            name: None,
-            source_filename: None,
-            raw_body: None,
-            compiled_body: None
-        };
+    for line in file.into_inner() {
+        println!("--> {:?}", line.as_rule());
 
         card.set_source_filename( filename.to_string() );
 
-        println!("{:#?}", campfire_file_pair);
+        match line.as_rule() {
+            Rule::card => { 
+                let inner_pairs = line.into_inner();
+                for pair in inner_pairs {
+                    match pair.as_rule() {
+                        Rule::card_name => {
+                            card.set_name(pair.as_str().to_string());
+                        },
+                        Rule::card_body => {
+                            card.set_raw_body(pair.as_str().to_string());
+                        },
+                        _ => { println!("Couldn't match {:?}", pair.as_rule()) }
+                    }
+                }
+            },
+            
+            Rule::EOI => { },
+            _ => { println!("Couldn't match {:?}", line.as_rule()) }
+        }
+    }
 
+    println!("{:#?}", card);
+
+    cardslist.push(card);
+
+    
+
+    
+
+    /*for campfire_file_pair in file.into_inner() {
+       
         match campfire_file_pair.as_rule() {
             Rule::card => {println!("---> Card!");}, 
             Rule::card_name => {
                 card.set_name(campfire_file_pair.as_str().to_string());
+                card.set_raw_body(campfire_file_pair.as_str().to_string());
             },
             Rule::card_body => {
-                println!("---> Card body");
+                //println!("---> Card body");
                 card.set_raw_body(campfire_file_pair.as_str().to_string());
             },
             Rule::EOI => (),
@@ -42,10 +72,10 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
         } 
 
         // For debug purposes, print out the Block elements
-        println!("{:?}", card);
+        
 
-        cardslist.push(card);
-    }
+        
+    }*/
 }
 
 

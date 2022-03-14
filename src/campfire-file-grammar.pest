@@ -10,4 +10,4 @@ end_keyword = _{ "$end" }
 card_start = _{ begin_keyword ~ SPACE_SEPARATOR* ~ card_name ~ SPACE_SEPARATOR* ~ "\n"? }
 card_body = {  (!"$end" ~ !SPACE_SEPARATOR ~ ANY)* } 
 card = { card_start ~ card_body ~ end_keyword }
-campfire_file = _{ SOI ~ "\n"* ~ (card ~ "\n"+) * ~ card? ~ EOI }
+campfire_file = { SOI ~ "\n"* ~ (card ~ "\n"+) * ~ card? ~ EOI }
