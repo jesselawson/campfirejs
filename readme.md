@@ -66,6 +66,16 @@ Examples:
 
 ## Anatomy of a Campfire expression
 
+### Expression shorthand syntax
+
+- For a basic link, you can use `{label}(target_card)`.
+
+IDEA: Maybe for this iteration, we ONLY implement the link expression shorthand? 
+IDEA: Maybe all the Campfire expression syntax looks like markdown (except the command tags, of course)? 
+
+I like that much more -- then you only really have to learn the ergonomics of the command tags, 
+rather than cmd tags AND cf expression tags. 
+
 v1: (open_tag) (label) (cf_operator) (target_card) (options) (close_tag)
 v1.1: (open_tag) (label) (cf_operator) (target_card) (close_tag)
 
