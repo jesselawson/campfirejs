@@ -12,17 +12,18 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
         .expect("unsuccessful parse")
         .next().unwrap();
 
-    println!("{:#?}", file);
+    //println!("{:#?}", file);
 
     let mut card = Card {
         name: None,
         source_filename: None,
         raw_body: None,
+        html_body: None,
         compiled_body: None
     };
 
     for line in file.into_inner() {
-        println!("--> {:?}", line.as_rule());
+        //println!("--> {:?}", line.as_rule());
 
         card.set_source_filename( filename.to_string() );
 
@@ -44,35 +45,10 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
             Rule::EOI => { },
             _ => { println!("Couldn't match {:?}", line.as_rule()) }
         }
+
+        cardslist.push(card.clone());
     }
 
-    cardslist.push(card);
-
-    
-
-    
-
-    /*for campfire_file_pair in file.into_inner() {
-       
-        match campfire_file_pair.as_rule() {
-            Rule::card => {println!("---> Card!");}, 
-            Rule::card_name => {
-                card.set_name(campfire_file_pair.as_str().to_string());
-                card.set_raw_body(campfire_file_pair.as_str().to_string());
-            },
-            Rule::card_body => {
-                //println!("---> Card body");
-                card.set_raw_body(campfire_file_pair.as_str().to_string());
-            },
-            Rule::EOI => (),
-            _ => unreachable!(),
-        } 
-
-        // For debug purposes, print out the Block elements
-        
-
-        
-    }*/
 }
 
 

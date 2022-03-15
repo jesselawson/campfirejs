@@ -5,11 +5,11 @@ $begin start
 
 Campfire is an engine for dynamic content.
 
-Content is stored on <c cards -> how_fun c>. When you click a regular link, a 
+Content is stored on <c [[cards]] -> how_fun c>. When you click a regular link, a 
 new card is revealed underneath the currently active card. 
 
-Another kind of link is a <c clear link -> basic_examples and clear c>; a clear link 
-will clear all cards before displaying the target card. 
+Another kind of link is a <c [[clear link]] -> basic_examples and clear c>; a clear link 
+will clear all cards before displaying the target card.
 
 $end
 
