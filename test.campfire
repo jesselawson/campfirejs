@@ -1,18 +1,13 @@
-$begin start
+This card starts with markdown, <c [[contains a link]] -> next_card c>, and has two paragraphs.
 
-// This is a comment 
-# Welcome to Campfire
+Here's the **second** paragraph. 
 
-Campfire is an engine for dynamic content.
+<c [[This whole paragraph is a campfire expression]] -> last_card c>.
 
-Content is stored on <c cards -> how_fun c>. When you click a regular link, a 
-new card is revealed underneath the currently active card. 
+And here's a paragraph with _just_ markdown.
 
-Another kind of link is a <c clear link -> basic_examples and clear c>; a clear link 
-will clear all cards before displaying the target card. 
+This is a card body. We can expect **markdown** in 
+a _variety of forms_, and also some Campfire expressions.
 
-$end
-
-$begin how_fun 
-Isn't this neat?
-$end
+A Campfire expression will be rendered just like a normal 
+link -- <c like this! -> next_card c>
