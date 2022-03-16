@@ -59,10 +59,22 @@ A card is composed of one or more campfire expressions.
 
 A campfire expression is any combination of markdown and campfire code. 
 
-Examples:
+```
+    label        target card   plugins
+%{in the dark}(strange_noises)[clear]
+```
 
+label: The HTML that gets rendered as the link
+target card: The card the link should action us to
+plugins: semicolon-separated list of plugins.
+
+Extendable via plugins, with many built-in plugins. 
+
+
+- `# Curious things %{in the dark}(strange_noises)[clear]`
 - `# Chapter one <c did_eat_berries ? (aka) post berries c>`
 - `Your favorite **campfire** code editor. <c neat! -> next_card c>`
+
 
 ## Anatomy of a Campfire expression
 
@@ -127,3 +139,9 @@ by command---e.g., `build.rs` in the project's root handles the `bones build` co
 TODO
 
 * Uses Turbo (formerly turbolinks)
+
+
+# Ideas
+
+- Group links together so that when one is clicked, the rest are no longer available. 
+  This is a game feature; is this necessary? (could this be achieved with a plugin-esque add-on?)

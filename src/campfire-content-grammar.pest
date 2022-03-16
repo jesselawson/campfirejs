@@ -1,16 +1,18 @@
 //content = { ((campfire_expression)* ~ ANY)* } 
-content = _{ expr ~ (!EOI ~ expr)* ~ expr? }
+content = { expr ~ (!EOI ~ expr)* ~ expr? }
 expr = _{ 
 	campfire_tag_expression | 
     markdown_expression
 }
-campfire_tag_expression = { start_tag ~ SPACE_SEPARATOR* ~ "[[" ~ label ~ "]]" ~ SPACE_SEPARATOR* ~ operator ~ SPACE_SEPARATOR* ~ target ~ SPACE_SEPARATOR+ ~ end_tag }
+//campfire_tag_expression = { start_tag ~ SPACE_SEPARATOR* ~ "[[" ~ label ~ "]]" ~ SPACE_SEPARATOR* ~ operator ~ SPACE_SEPARATOR* ~ target ~ SPACE_SEPARATOR+ ~ end_tag }
+campfire_tag_expression = { "%{" ~ SPACE_SEPARATOR* ~ label ~ SPACE_SEPARATOR* ~ "}(" ~ target ~ ")" }
+
 //campfire_command_expression = { "$" ~ token ~ SPACE_SEPARATOR+ ~ token }
-markdown_expression = { (!"$" ~ !"<c" ~ ANY)* }
-start_tag = { "<c" }
-end_tag = { "c>" }
-operator = { "->" } 
+markdown_expression = { (!"$" ~ !"%{" ~ !start_tag ~ ANY)* }
+start_tag = { ("&lt;c"|"<c") }
+end_tag = { ("c>"|"c&gt;") }
+operator = { ("->"|"-&gt;") } 
 token = { (!SPACE_SEPARATOR ~ !SYMBOL ~ ANY)+ } 
 cmd = { token }
-target = { (!SPACE_SEPARATOR ~ !SYMBOL ~ ANY)+ } 
-label = {  (!("]]") ~ ANY)+ } 
+target = { (!SPACE_SEPARATOR ~ !SYMBOL ~ !")" ~ ANY)+ } 
+label = {  (!("}(") ~ ANY)+ } 

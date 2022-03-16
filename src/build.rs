@@ -7,11 +7,7 @@ mod boneserror;
 use boneserror::*;
 
 mod compiler;
-
 mod parser;
-#[allow(unused_imports)]
-use parser::*;
-
 
 pub fn do_build() -> Result<(), boneserror::CampfireError> {
   println!("Building Campfire project...");
@@ -30,24 +26,34 @@ pub fn do_build() -> Result<(), boneserror::CampfireError> {
   let mut cardslist:Vec<Card> = Vec::<Card>::new();
 
   parser::parse_campfire_file_as_string(&main_file_name, &main_file_as_string.unwrap(), &mut cardslist);
+
+  let comrak_render_options = comrak::ComrakRenderOptions {
+    unsafe_: true,
+    ..Default::default()
+  };
+
+  let comrak_options = comrak::ComrakOptions {
+    render: comrak_render_options,
+    ..Default::default()
+  };
   
   // Convert to markdown
   for card in cardslist.iter_mut().enumerate() {
     let (_i,val):(usize, &mut Card) = card;
     if !&val.name.as_ref().is_none() { // If you don't check for this, you may get an error
                                        // while trying to .unwrap() a None (in the below param to markdown_to_html)
-      val.set_html_body( comrak::markdown_to_html( &val.raw_body.as_ref().unwrap() , &comrak::ComrakOptions::default()) );
+      val.set_html_body( comrak::markdown_to_html( &val.raw_body.as_ref().unwrap() , &comrak_options) );
     }
   }
   
   compiler::compile_campfire_card_content(&mut cardslist);
 
-  for card in cardslist.iter_mut().enumerate() {
+  /*for card in cardslist.iter_mut().enumerate() {
     let (_i,val):(usize, &mut Card) = card;
     if !&val.name.as_ref().is_none() {
       println!("{:#?}", &val);
     }
-  }
+  }*/
 
   Ok(())
 }
