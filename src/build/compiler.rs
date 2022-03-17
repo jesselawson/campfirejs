@@ -11,7 +11,7 @@ struct ContentParser;
 
 fn card_exists(name:&str, known_card_names:&Vec<String>) -> bool {
     for card in known_card_names {
-        println!("----------> Checking if {} == {}...", name, card.as_str());
+        // println!("----------> Checking if {} == {}...", name, card.as_str());
         if name == card.as_str() {
             return true;
         }
@@ -27,7 +27,7 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
   for card in cardslist.iter_mut().enumerate() {
     let(_i,val):(usize,&mut Card) = card;
     known_card_names.push(val.name.as_ref().unwrap().to_string());
-    println!("--> Adding card {}...", val.name.as_ref().unwrap());
+    //println!("--> Adding card {}...", val.name.as_ref().unwrap());
   }
 
     
@@ -41,7 +41,7 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
     scratch.push_str("\">");
 
     if !&val.name.as_ref().is_none() {
-        println!("Compiling card {}...", &val.name.as_ref().unwrap());
+        //println!("Compiling card {}...", &val.name.as_ref().unwrap());
         //println!("html_body: {}", &val.html_body.as_ref().unwrap());
         
         let content = ContentParser::parse(Rule::content, &val.html_body.as_ref().unwrap())
@@ -79,7 +79,7 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
                             target_scratch.push_str(&pair.as_str())
                         },
                             _ => { 
-                                println!("Unknown expression type found in card '{:?}': {:#?}", &val.name.as_ref().unwrap(), pair.as_str());
+                                println!("Compiler error: unknown expression type found in card '{:?}': {:#?}", &val.name.as_ref().unwrap(), pair.as_str());
                                 return Err(CampfireError::UnknownExpressionType);
                             }
                         }
@@ -104,7 +104,7 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
                 },
                 //Rule::campfire_cmd_expression => {},
                 _ => { 
-                    println!("-----> Couldn't match {:?}", expr.as_rule());
+                    println!("Couldn't match {:?}", expr.as_rule());
                     return Err(CampfireError::UnknownExpressionType);
                 }
             }

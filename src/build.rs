@@ -27,7 +27,12 @@ pub fn do_build() -> Result<(), error::CampfireError> {
 
   let mut cardslist:Vec<Card> = Vec::<Card>::new();
 
-  parser::parse_campfire_file_as_string(&main_file_name, &main_file_as_string.unwrap(), &mut cardslist);
+  match parser::parse_campfire_file_as_string(&main_file_name, &main_file_as_string.as_ref().unwrap(), &mut cardslist) {
+    Ok(()) => { },
+    Err(some_error) => {
+      return Err(some_error)
+    }
+  }
 
   let comrak_render_options = comrak::ComrakRenderOptions {
     unsafe_: true,
@@ -49,7 +54,7 @@ pub fn do_build() -> Result<(), error::CampfireError> {
   }
   
   match compiler::compile_campfire_card_content(&mut cardslist) {
-    Ok(()) => { println!("Compilation complete") },
+    Ok(()) => { println!("✅ {}", &main_file_name); },
     Err(some_error) => {
       println!("Compilation halted: {}", campfire_error(some_error));
     }

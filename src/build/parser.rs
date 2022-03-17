@@ -1,12 +1,13 @@
 use pest::Parser;                                                                                                                                                                                    
 use super::Card; 
+use super::CampfireError;
                                                                                                                                                                                                 
 #[derive(Parser)]                                                                                                                                                                                    
 #[grammar = "campfire-file-grammar.pest"]                                                                                                                                                                            
 struct CardParser; 
 
 // Reads the *.campfire file and populates cardslist
-pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, cardslist:&mut Vec<Card>) {
+pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, cardslist:&mut Vec<Card>) -> Result<(), CampfireError>{
     
     let file = CardParser::parse(Rule::campfire_file, file_string.as_str())
         .expect("unsuccessful parse")
@@ -23,7 +24,6 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
     };
 
     for line in file.into_inner() {
-        //println!("--> {:?}", line.as_rule());
 
         card.set_source_filename( filename.to_string() );
 
@@ -38,16 +38,24 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
                         Rule::card_body => {
                             card.set_raw_body(pair.as_str().to_string());
                         },
-                        _ => { println!("Couldn't match {:?}", pair.as_rule()) }
+                        _ => { 
+                            println!("Couldn't parse the following: {:?}", pair.as_rule());
+                            return Err(CampfireError::UnknownExpressionType);
+
+                        }
                     }
                 }
             },
-            Rule::EOI => { },
+            Rule::EOI => { 
+                break; // This prevents a duplicated last card in the file
+            },
             _ => { println!("Couldn't match {:?}", line.as_rule()) }
         }
 
         cardslist.push(card.clone());
     }
+
+    Ok(())
 
 }
 

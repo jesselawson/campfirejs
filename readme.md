@@ -55,49 +55,52 @@ part of that cardk, up to either the end of the file or another `$begin` stateme
 
 ## Language design
 
-A card is composed of one or more campfire expressions.
+A card is composed of one or more Campfire expressions.
 
-A campfire expression is any combination of markdown and campfire code. 
+A campfire expression is any combination of Markdown and Campfire snippets.
+
+For the **Alpha** version of Campfire, there is only one snippet available: the **link**.
+
+A link behaves like an `a` tag, but instead of going to a new page, it reveals 
+the target card.
+
+```campfire
+You can go to the %{cabin}(go_to_cabin) or %{the car}(go_to_car!).
+```
+
+In the above example, the word `cabin` is rendered as a Campfire link that will 
+reveal the `go_to_cabin` card when clicked. 
 
 ```
-    label        target card   plugins
-%{in the dark}(strange_noises)[clear]
+    label        target card
+%{cabin}(go_to_cabin)
+```
+
+The roadmap is exploring **plugins** for the beta version.
+
+`%{cabin}(go_to_cabin)[some_plugin]`
+
+Each plugin is a function that is automatically injected with a data structure 
+to help you customize Campfire: 
+
+```campfire
+Take me to your %{leader}(go_to_leader)[toggleOnClick;randomBackground]
+```
+
+```typescript
+function toggleOnClick() {
+  window.campfire.getDocument(); // returns an array of all cards
+  window.campfire.getCurrentCard(); // returns the most recently called card as DIV Element
+  window.campfire.getCard(name); // Returns card by name as DIV Element
+  window.campfire.thisLink(); // Returns this link's id as SPAN Element
+}
 ```
 
 label: The HTML that gets rendered as the link
 target card: The card the link should action us to
 plugins: semicolon-separated list of plugins.
 
-Extendable via plugins, with many built-in plugins. 
-
-
-- `# Curious things %{in the dark}(strange_noises)[clear]`
-- `# Chapter one <c did_eat_berries ? (aka) post berries c>`
-- `Your favorite **campfire** code editor. <c neat! -> next_card c>`
-
-
-## Anatomy of a Campfire expression
-
-### Expression shorthand syntax
-
-- For a basic link, you can use `{label}(target_card)`.
-
-IDEA: Maybe for this iteration, we ONLY implement the link expression shorthand? 
-IDEA: Maybe all the Campfire expression syntax looks like markdown (except the command tags, of course)? 
-
-I like that much more -- then you only really have to learn the ergonomics of the command tags, 
-rather than cmd tags AND cf expression tags. 
-
-v1: (open_tag) (label) (cf_operator) (target_card) (options) (close_tag)
-v1.1: (open_tag) (label) (cf_operator) (target_card) (close_tag)
-
-cf_operator = 
-{
-  cf_link_operator
-}
-
-
-cf_link_operator = { “->” }
+Extendable via plugins, with many built-in plugins.
 
 ## Hyperlinks
 

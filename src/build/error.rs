@@ -11,8 +11,6 @@ pub static BONES_ERROR_MISSING_MAIN_FILE: &'static str = "Missing main.bn file."
 #[derive(Debug)]
 pub enum CampfireError {
   MissingMainFile,
-  ParseError,
-  CampfireExpressionCompileError,
   UnknownExpressionType,
   CardDoesNotExist
 }
@@ -23,8 +21,6 @@ pub enum CampfireError {
 pub fn campfire_error(err:CampfireError) -> &'static str {
   match err {
     CampfireError::MissingMainFile => "Cannot find start.campfire file!",
-    CampfireError::ParseError => "Parse error",
-    CampfireError::CampfireExpressionCompileError => "Error parsing Campfire expression",
     CampfireError::UnknownExpressionType => "Unknown expression type found in file",
     CampfireError::CardDoesNotExist => "Found link to non-existent card",
     _ => unreachable!()
