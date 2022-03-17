@@ -19,7 +19,12 @@ fn main() {
 
     if !command.is_none() {
       match command.as_deref() {
-         Some("build") => { do_build(); },
+         Some("build") => { 
+            match do_build() {
+              Ok(()) => { },
+            _ => unreachable!()
+          } 
+        },
          Some("publish") => { do_publish() },
          _ => { show_banner(); }
       }
