@@ -3,6 +3,8 @@
 mod card;
 #[allow(unused_imports)]
 use card::*;
+mod document;
+use document::*;
 mod boneserror;
 use boneserror::*;
 
@@ -48,12 +50,12 @@ pub fn do_build() -> Result<(), boneserror::CampfireError> {
   
   compiler::compile_campfire_card_content(&mut cardslist);
 
-  /*for card in cardslist.iter_mut().enumerate() {
+  for card in cardslist.iter_mut().enumerate() {
     let (_i,val):(usize, &mut Card) = card;
     if !&val.name.as_ref().is_none() {
       println!("{:#?}", &val);
     }
-  }*/
+  }
 
   Ok(())
 }
