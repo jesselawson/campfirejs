@@ -29,4 +29,9 @@ So **most** normal Markdown syntax will just _work_; you can always see the
 
 $end
 
+$begin neato_burrito
+
+Ha! This is a silly card. 
+
+$end
 

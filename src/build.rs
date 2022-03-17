@@ -5,13 +5,13 @@ mod card;
 use card::*;
 mod document;
 use document::*;
-mod boneserror;
-use boneserror::*;
+mod error;
+use error::*;
 
 mod compiler;
 mod parser;
 
-pub fn do_build() -> Result<(), boneserror::CampfireError> {
+pub fn do_build() -> Result<(), error::CampfireError> {
   println!("Building Campfire project...");
 
   let main_file_name = String::from("start.campfire");
@@ -48,14 +48,19 @@ pub fn do_build() -> Result<(), boneserror::CampfireError> {
     }
   }
   
-  compiler::compile_campfire_card_content(&mut cardslist);
+  match compiler::compile_campfire_card_content(&mut cardslist) {
+    Ok(()) => { println!("Compilation complete") },
+    Err(some_error) => {
+      println!("Compilation halted: {}", campfire_error(some_error));
+    }
+  }
 
-  for card in cardslist.iter_mut().enumerate() {
+  /*for card in cardslist.iter_mut().enumerate() {
     let (_i,val):(usize, &mut Card) = card;
     if !&val.name.as_ref().is_none() {
       println!("{:#?}", &val);
     }
-  }
+  }*/
 
   Ok(())
 }

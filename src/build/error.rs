@@ -13,6 +13,8 @@ pub enum CampfireError {
   MissingMainFile,
   ParseError,
   CampfireExpressionCompileError,
+  UnknownExpressionType,
+  CardDoesNotExist
 }
 
 // TODO: When there's a specific error on a specific line, 
@@ -23,6 +25,8 @@ pub fn campfire_error(err:CampfireError) -> &'static str {
     CampfireError::MissingMainFile => "Cannot find start.campfire file!",
     CampfireError::ParseError => "Parse error",
     CampfireError::CampfireExpressionCompileError => "Error parsing Campfire expression",
+    CampfireError::UnknownExpressionType => "Unknown expression type found in file",
+    CampfireError::CardDoesNotExist => "Found link to non-existent card",
     _ => unreachable!()
   }
 }

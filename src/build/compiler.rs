@@ -1,14 +1,35 @@
+use std::ptr::eq;
+
 use pest::Parser;                                                                                                                                                                                    
 use super::Card; 
 use super::Document;
+use super::error::CampfireError;
                                                                                                                                                                                                 
 #[derive(Parser)]                                                                                                                                                                                    
 #[grammar = "campfire-content-grammar.pest"]                                                                                                                                                                            
 struct ContentParser; 
 
+fn card_exists(name:&str, known_card_names:&Vec<String>) -> bool {
+    for card in known_card_names {
+        println!("----------> Checking if {} == {}...", name, card.as_str());
+        if name == card.as_str() {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Reads the *.campfire file and populates cardslist
-pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) {
-    let mut campfire_link_counter = 0;
+pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), CampfireError>{
+  let mut campfire_link_counter = 0;
+    let mut known_card_names:Vec<String> = Vec::<String>::new();
+
+  for card in cardslist.iter_mut().enumerate() {
+    let(_i,val):(usize,&mut Card) = card;
+    known_card_names.push(val.name.as_ref().unwrap().to_string());
+    println!("--> Adding card {}...", val.name.as_ref().unwrap());
+  }
+
     
   for card in cardslist.iter_mut().enumerate() {
     let mut scratch = String::from("");
@@ -20,7 +41,7 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) {
     scratch.push_str("\">");
 
     if !&val.name.as_ref().is_none() {
-        println!("Compiling {}...", &val.name.as_ref().unwrap());
+        println!("Compiling card {}...", &val.name.as_ref().unwrap());
         //println!("html_body: {}", &val.html_body.as_ref().unwrap());
         
         let content = ContentParser::parse(Rule::content, &val.html_body.as_ref().unwrap())
@@ -28,14 +49,15 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) {
         .next().unwrap();
 
         for expr in content.into_inner() {
-            println!("expr: {:#?}: {:#?}", expr.as_rule(), expr.as_str());
+            //println!("expr: {:#?}: {:#?}", expr.as_rule(), expr.as_str());
             match expr.as_rule() {
                 Rule::markdown_expression => { 
-                    println!("-> Got markdown expression");
+                    //println!("-> Got markdown expression");
                     scratch.push_str(expr.as_str());
                 },
                 Rule::campfire_link_expression => {
-                    println!("-> Got campfire tag expression");
+                    //println!("-> Got campfire tag expression");
+
                     let mut link_tag_scratch = String::from("<span class=\"campfire-card-label\" id=\"");
                     let mut label_scratch = String::from("");
                     let mut target_scratch = String::from("");
@@ -43,13 +65,23 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) {
                     for pair in expr.into_inner() {
                         
                         match pair.as_rule() {
-                            Rule::label => { println!("--> Found label: {}", &pair.as_str());
-                            label_scratch.push_str(&pair.as_str());
-                        },
-                            Rule::target => { println!("--> Found target: {}", &pair.as_str());
+                            Rule::label => { 
+                                //println!("--> Found label: {}", &pair.as_str());
+                                label_scratch.push_str(&pair.as_str());
+                            },
+                            Rule::target => { 
+                                //println!("--> Found target: {}", &pair.as_str());
+                                // Make sure card linked-to actually exists
+                                if !card_exists(&pair.as_str(), &known_card_names) {
+                                    println!("Compiler error: found link to non-existent card '{}'!", &pair.as_str());
+                                    return Err(CampfireError::CardDoesNotExist);
+                            }
                             target_scratch.push_str(&pair.as_str())
                         },
-                            _ => { println!("Error compiling Campfire tag expression:\n--> Card: {:?}\n--> {:#?}", &val.name.as_ref().unwrap(), pair.as_str()) }            
+                            _ => { 
+                                println!("Unknown expression type found in card '{:?}': {:#?}", &val.name.as_ref().unwrap(), pair.as_str());
+                                return Err(CampfireError::UnknownExpressionType);
+                            }
                         }
                     }
 
@@ -71,7 +103,10 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) {
                     //link_tag_scratch.push_str()
                 },
                 //Rule::campfire_cmd_expression => {},
-                _ => { println!("-----> Couldn't match {:?}", expr.as_rule()) }
+                _ => { 
+                    println!("-----> Couldn't match {:?}", expr.as_rule());
+                    return Err(CampfireError::UnknownExpressionType);
+                }
             }
         }
         //val.set_compiled_body(compile_content(&val.compiled_body.as_ref().unwrap()).unwrap());
@@ -83,6 +118,8 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) {
 
     // End of card for-loop
   }
+
+  return Ok(())
 }
 
 
