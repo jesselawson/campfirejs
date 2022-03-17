@@ -1,6 +1,8 @@
 
 
 mod card;
+use std::{process::exit, io::Write};
+
 #[allow(unused_imports)]
 use card::*;
 mod document;
@@ -60,12 +62,35 @@ pub fn do_build() -> Result<(), error::CampfireError> {
     }
   }
 
-  /*for card in cardslist.iter_mut().enumerate() {
+  // Write compiled_body for all cards to file
+  let path = std::path::Path::new("project/test.html");
+  let prefix = path.parent().unwrap();
+  
+  match std::fs::create_dir_all(prefix) {
+    Ok(_) => {},
+    Err(err) => { eprintln!("Error creating project directory: {}", err); exit(1);}
+  }
+  
+  let mut file_pointer= match std::fs::File::create(path) {
+    Ok(file) => { file },
+    _ => { println!("Unable to create output file!"); exit(1); }
+  };
+  
+  for card in cardslist.iter_mut().enumerate() {
     let (_i,val):(usize, &mut Card) = card;
     if !&val.name.as_ref().is_none() {
-      println!("{:#?}", &val);
+      /*match std::fs::write(path, &val.compiled_body.as_ref().unwrap()) {
+        Ok(_file) => {},
+        Err(err) => {println!("Error writing to project: {}", err);}
+      }*/
+      match file_pointer.write(&val.compiled_body.as_ref().unwrap().as_bytes()) {
+        Ok(_) => {},
+        Err(err) => { eprintln!("Error writing to project file: {}", err); exit(1);}
+      }
     }
-  }*/
+  }
+
+
 
   Ok(())
 }
