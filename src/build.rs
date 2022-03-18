@@ -62,6 +62,13 @@ pub fn do_build() -> Result<(), error::CampfireError> {
     }
   }
 
+  match compiler::build_campfire_project_dir() {
+    Ok (()) => { println!("✅ Project directory");},
+    Err(some_error) => {
+      println("Compilation halted: {}", campfire_error(some_error));
+    }
+  }
+
   // Write compiled_body for all cards to file
   let path = std::path::Path::new("project/test.html");
   let prefix = path.parent().unwrap();

@@ -1,6 +1,7 @@
 use pest::Parser;                                                                                                                                                                                    
 use super::Card; 
 use super::CampfireError;
+use super::Document;
                                                                                                                                                                                                 
 #[derive(Parser)]                                                                                                                                                                                    
 #[grammar = "campfire-file-grammar.pest"]                                                                                                                                                                            
@@ -23,11 +24,30 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
         compiled_body: None
     };
 
+    let mut document = Document {
+        filename: Some(String::from("index.html")),
+        header_content: None,
+        body_content: None,
+        footer_content: None
+    };
+
     for line in file.into_inner() {
 
         card.set_source_filename( filename.to_string() );
 
         match line.as_rule() {
+            Rule::campfire_set_command => {
+                let inner_pairs = line.into_inner();
+                for pair in inner_pairs {
+                    match pair.as_rule() {
+                        // TODO -- continue getting $set details, and populate Document.
+                        _ => {
+                            return Err(CampfireError::MalformedCampfireSetCommand);
+                        }
+                    }
+                }
+            },
+
             Rule::card => { 
                 let inner_pairs = line.into_inner();
                 for pair in inner_pairs {

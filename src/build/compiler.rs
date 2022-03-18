@@ -26,11 +26,11 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
 
   for card in cardslist.iter_mut().enumerate() {
     let(_i,val):(usize,&mut Card) = card;
-    known_card_names.push(val.name.as_ref().unwrap().to_string());
-    //println!("--> Adding card {}...", val.name.as_ref().unwrap());
+    known_card_names.push(val.name.as_ref().unwrap().to_string());              // Storing card names here so we have an 
+    //println!("--> Adding card {}...", val.name.as_ref().unwrap());            // array to search through for card_exists()
   }
 
-    
+  // Populate compiled_body of each card
   for card in cardslist.iter_mut().enumerate() {
     let mut scratch = String::from("");
     let(_i,val):(usize, &mut Card) = card;
@@ -44,7 +44,9 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
         //println!("Compiling card {}...", &val.name.as_ref().unwrap());
         //println!("html_body: {}", &val.html_body.as_ref().unwrap());
         
-        let content = ContentParser::parse(Rule::content, &val.html_body.as_ref().unwrap())
+        let content = ContentParser::parse(
+            Rule::content, 
+            &val.html_body.as_ref().unwrap())
         .expect("failed to compile content for card")
         .next().unwrap();
 
@@ -122,4 +124,7 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
   return Ok(())
 }
 
+pub fn build_campfire_project_dir() {
+
+}
 
