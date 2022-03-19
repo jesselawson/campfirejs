@@ -1,5 +1,3 @@
-use std::ptr::eq;
-
 use pest::Parser;                                                                                                                                                                                    
 use super::Card; 
 use super::Document;
@@ -124,7 +122,8 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
   return Ok(())
 }
 
-pub fn build_campfire_project_dir() {
-
+pub fn build_campfire_project_dir() -> Result<(),CampfireError> {
+    
+    return Ok(())
 }
 

@@ -2,13 +2,38 @@ use pest::Parser;
 use super::Card; 
 use super::CampfireError;
 use super::Document;
+use std::path::Path;
+use std::fs;
+
                                                                                                                                                                                                 
 #[derive(Parser)]                                                                                                                                                                                    
 #[grammar = "campfire-file-grammar.pest"]                                                                                                                                                                            
 struct CardParser; 
 
-// Reads the *.campfire file and populates cardslist
-pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, cardslist:&mut Vec<Card>) -> Result<(), CampfireError>{
+fn check_for_custom_footer_template(document:&mut Document) -> Result<(), CampfireError> {
+    let footer_file = Path::new("footer.html");
+    if footer_file.exists() {
+        let content = match fs::read_to_string(footer_file) {
+            Ok(file_as_string) => { file_as_string },
+            Err(error) => {
+                eprintln!("{}", error);
+                return Err(CampfireError::UnableToReadFooterFile);
+            }
+        };
+        
+        if !content.is_empty() {
+            document.footer_content = Some(content);
+        }
+    } else {
+        document.use_default_footer();
+    }
+
+    Ok(())
+}
+
+/// Returns a Document that contains any config vars that were declared, as well 
+/// as the content of the header, body, and footer
+pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, cardslist:&mut Vec<Card>) -> Result<Document, CampfireError>{
     
     let file = CardParser::parse(Rule::campfire_file, file_string.as_str())
         .expect("unsuccessful parse")
@@ -28,7 +53,8 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
         filename: Some(String::from("index.html")),
         header_content: None,
         body_content: None,
-        footer_content: None
+        footer_content: None,
+        title: None,
     };
 
     for line in file.into_inner() {
@@ -36,11 +62,25 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
         card.set_source_filename( filename.to_string() );
 
         match line.as_rule() {
+            // Predefined commands
             Rule::campfire_set_command => {
+
                 let inner_pairs = line.into_inner();
                 for pair in inner_pairs {
                     match pair.as_rule() {
                         // TODO -- continue getting $set details, and populate Document.
+                        Rule::command_target => {
+                            match pair.as_str() {
+                                "title" => {},
+                                _ => {
+                                    return Err(CampfireError::UnknownCampfireSetCommand);
+                                }
+                            }
+
+                        },
+                        Rule::command_value => {
+
+                        },
                         _ => {
                             return Err(CampfireError::MalformedCampfireSetCommand);
                         }
@@ -75,7 +115,7 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
         cardslist.push(card.clone());
     }
 
-    Ok(())
+    Ok(document)
 
 }
 

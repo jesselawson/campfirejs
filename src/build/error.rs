@@ -12,7 +12,10 @@ pub static BONES_ERROR_MISSING_MAIN_FILE: &'static str = "Missing main.bn file."
 pub enum CampfireError {
   MissingMainFile,
   UnknownExpressionType,
-  CardDoesNotExist
+  CardDoesNotExist,
+  MalformedCampfireSetCommand,
+  UnknownCampfireSetCommand,
+  UnableToReadFooterFile
 }
 
 // TODO: When there's a specific error on a specific line, 
@@ -23,6 +26,9 @@ pub fn campfire_error(err:CampfireError) -> &'static str {
     CampfireError::MissingMainFile => "Cannot find start.campfire file!",
     CampfireError::UnknownExpressionType => "Unknown expression type found in file",
     CampfireError::CardDoesNotExist => "Found link to non-existent card",
+    CampfireError::MalformedCampfireSetCommand => "The $set command does not adhere to the $set syntax: $set @<var_target> <value>",
+    CampfireError::UnknownCampfireSetCommand => "That $set target does not exist! Omit the @ and you can set a custom var instead.",
+    CampfireError::UnableToReadFooterFile => "A 'footer.html' template was found, but it could not be read.",
     _ => unreachable!()
   }
 }
