@@ -1,3 +1,5 @@
+$set @title = Welcome to Campfire
+
 $begin start
 
 Hello.

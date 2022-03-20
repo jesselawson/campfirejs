@@ -2,6 +2,7 @@ use pest::Parser;
 use super::Card; 
 use super::CampfireError;
 use super::Document;
+use super::error::campfire_error;
 use std::path::Path;
 use std::fs;
 
@@ -10,7 +11,33 @@ use std::fs;
 #[grammar = "campfire-file-grammar.pest"]                                                                                                                                                                            
 struct CardParser; 
 
-fn check_for_custom_footer_template(document:&mut Document) -> Result<(), CampfireError> {
+// If a header.html file is detected, the contents are read in as the header.
+fn set_default_or_custom_header(document:&mut Document) -> Result<bool, CampfireError> {
+    let header_file = Path::new("header.html");
+    if header_file.exists() {
+        let content = match fs::read_to_string(header_file) {
+            Ok(file_as_string) => { file_as_string },
+            Err(error) => {
+                eprintln!("{}", error);
+                return Err(CampfireError::UnableToReadHeaderFile);
+            }
+        };
+        
+        if !content.is_empty() {
+            document.header_content = content;
+            Ok(true)
+        } else {
+            eprintln!("Header template found, but it's empty!");
+            return Err(CampfireError::EmptyHeaderFileFound);
+        }
+    } else {
+        document.use_default_header();
+        Ok(false)
+    }
+}
+
+// If a footer.html file is detected, the contents are read in as the footer.
+fn set_default_or_custom_footer(document:&mut Document) -> Result<bool, CampfireError> {
     let footer_file = Path::new("footer.html");
     if footer_file.exists() {
         let content = match fs::read_to_string(footer_file) {
@@ -22,13 +49,17 @@ fn check_for_custom_footer_template(document:&mut Document) -> Result<(), Campfi
         };
         
         if !content.is_empty() {
-            document.footer_content = Some(content);
+            document.footer_content = content;
+            Ok(true)
+        } else {
+            eprintln!("Footer template found, but it's empty!");
+            return Err(CampfireError::EmptyFooterFileFound);
         }
+
     } else {
         document.use_default_footer();
+        Ok(false)
     }
-
-    Ok(())
 }
 
 /// Returns a Document that contains any config vars that were declared, as well 
@@ -50,12 +81,26 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
     };
 
     let mut document = Document {
-        filename: Some(String::from("index.html")),
-        header_content: None,
-        body_content: None,
-        footer_content: None,
-        title: None,
+        filename: String::from("index.html"),
+        header_content: String::new(),
+        body_content: String::new(),
+        footer_content: String::new(),
+        title: String::new(),
     };
+
+    match set_default_or_custom_header(&mut document) {
+        Ok(using) => { if using { println!("\t📄 Using custom header template") } },
+        Err(some_error) => { 
+            campfire_error(some_error);
+        }
+    }
+
+    match set_default_or_custom_footer(&mut document) {
+    Ok(using) => { if using { println!("\t📄 Using custom footer template") } },
+        Err(some_error) => { 
+            campfire_error(some_error);
+        }
+    }
 
     for line in file.into_inner() {
 
@@ -104,15 +149,15 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
 
                         }
                     }
+                    
                 }
+                cardslist.push(card.clone());
             },
             Rule::EOI => { 
                 break; // This prevents a duplicated last card in the file
             },
             _ => { println!("Couldn't match {:?}", line.as_rule()) }
         }
-
-        cardslist.push(card.clone());
     }
 
     Ok(document)

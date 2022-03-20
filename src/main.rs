@@ -5,6 +5,7 @@ extern crate pest_derive;
 
 mod build; 
 use build::do_build;
+use build::error::campfire_error;
 mod publish; use publish::*;
 
 fn show_banner() {
@@ -21,8 +22,10 @@ fn main() {
       match command.as_deref() {
          Some("build") => { 
             match do_build() {
-              Ok(()) => { },
-            _ => unreachable!()
+              Ok(()) => { println!("🪵🔥🪵 Compilation successful!") },
+              Err(some_error) => {
+                campfire_error(some_error);
+              }
           } 
         },
          Some("publish") => { do_publish() },

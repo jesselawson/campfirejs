@@ -128,6 +128,37 @@ any derivative event from a click:
 | Mouse down                    | `next_card1_mouse_down_event` |
 | Mouse up                      | `next_card1_mouse_up_event`   | 
 
+# Architecture
+
+Campfire produces a single `index.html` file that is structured as follows:
+
+```
+| -------------------- |
+|        header        |
+| -------------------- |
+|         body         |
+| -------------------- |
+|      javascript      |
+| -------------------- |
+|        footer        |
+| -------------------- |
+```
+
+
+
+## Parsing
+
+The parser reads the *.campfire file in two stages:
+- First, it organizes the file into cards and both campfire & custom set commands.
+- Second, it organizes cards into markdown and campfire content.
+
+## Compiling
+
+The compiler is responsible for compiling the markdown and campfire expressions.
+
+
+
+
 # Contributing 
 
 TODO

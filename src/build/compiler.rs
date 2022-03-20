@@ -1,3 +1,6 @@
+use std::io::Write;
+use std::process::exit;
+
 use pest::Parser;                                                                                                                                                                                    
 use super::Card; 
 use super::Document;
@@ -17,14 +20,19 @@ fn card_exists(name:&str, known_card_names:&Vec<String>) -> bool {
     return false;
 }
 
-// Reads the *.campfire file and populates cardslist
-pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), CampfireError>{
+// Given a cardslist and a document, compiles all the cards from cardslist's 
+// and then populates the document
+pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&mut Document) -> Result<(), CampfireError>{
   let mut campfire_link_counter = 0;
     let mut known_card_names:Vec<String> = Vec::<String>::new();
 
   for card in cardslist.iter_mut().enumerate() {
     let(_i,val):(usize,&mut Card) = card;
-    known_card_names.push(val.name.as_ref().unwrap().to_string());              // Storing card names here so we have an 
+    println!("{:#?}", &val);
+    if !val.name.is_none() {
+        known_card_names.push(val.name.as_ref().unwrap().to_string()); 
+    }
+                                              // Storing card names here so we have an 
     //println!("--> Adding card {}...", val.name.as_ref().unwrap());            // array to search through for card_exists()
   }
 
@@ -73,13 +81,13 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
                                 //println!("--> Found target: {}", &pair.as_str());
                                 // Make sure card linked-to actually exists
                                 if !card_exists(&pair.as_str(), &known_card_names) {
-                                    println!("Compiler error: found link to non-existent card '{}'!", &pair.as_str());
+                                    eprintln!("Compiler error: found link to non-existent card '{}'!", &pair.as_str());
                                     return Err(CampfireError::CardDoesNotExist);
                             }
                             target_scratch.push_str(&pair.as_str())
                         },
                             _ => { 
-                                println!("Compiler error: unknown expression type found in card '{:?}': {:#?}", &val.name.as_ref().unwrap(), pair.as_str());
+                                eprintln!("Compiler error: unknown expression type found in card '{:?}': {:#?}", &val.name.as_ref().unwrap(), pair.as_str());
                                 return Err(CampfireError::UnknownExpressionType);
                             }
                         }
@@ -117,13 +125,41 @@ pub fn compile_campfire_card_content(cardslist:&mut Vec<Card>) -> Result<(), Cam
     let _ = &val.set_compiled_body(scratch);
 
     // End of card for-loop
+    document.body_content.push_str(&val.compiled_body.as_ref().unwrap().to_string());
   }
 
   return Ok(())
 }
 
-pub fn build_campfire_project_dir() -> Result<(),CampfireError> {
-    
+pub fn build_campfire_project_dir(document:&mut Document) -> Result<(),CampfireError> {
+    // Write compiled_body for all cards to file
+  let path = std::path::Path::new("project/index.html");
+  let prefix = path.parent().unwrap_or_else(|| std::path::Path::new("project"));
+  
+  match std::fs::create_dir_all(prefix) {
+    Ok(_) => {  },
+    Err(err) => { eprintln!("Error creating project directory: {}", err); exit(1);}
+  }
+  
+  let mut file_pointer= match std::fs::File::create(path) {
+    Ok(file) => { file },
+    _ => { println!("Unable to create output file!"); exit(1); }
+  };
+  
+  
+  match file_pointer.write(document.get_final_file_contents().as_bytes()) {
+    Ok(_) => {},
+    Err(err) => { eprintln!("Error writing to project file: {}", err); exit(1);}
+  }
     return Ok(())
+}
+
+
+/// Goes through all Document.links_stack and generates javascript to attach to them
+/// which handles onclick events.
+pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), CampfireError> {
+
+
+    Ok(())
 }
 
