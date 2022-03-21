@@ -128,24 +128,8 @@ any derivative event from a click:
 | Mouse down                    | `next_card1_mouse_down_event` |
 | Mouse up                      | `next_card1_mouse_up_event`   | 
 
+
 # Architecture
-
-Campfire produces a single `index.html` file that is structured as follows:
-
-```
-| -------------------- |
-|        header        |
-| -------------------- |
-|         body         |
-| -------------------- |
-|      javascript      |
-| -------------------- |
-|        footer        |
-| -------------------- |
-```
-
-
-
 ## Parsing
 
 The parser reads the *.campfire file in two stages:
@@ -156,8 +140,42 @@ The parser reads the *.campfire file in two stages:
 
 The compiler is responsible for compiling the markdown and campfire expressions.
 
+## Generating Javascript
 
+### Global variables
 
+Campfire creates a set of empty functions that can be overridden to provide 
+custom functionality based on event listeners attached to each link. 
+
+Using the example link `%{Let's go!}(next_card)`, the following 
+event functions can be overridden: 
+
+| Event type    | Global function 
+| ------------- | ---------------------
+| `mouseenter`  | `window.Campfire.next
+| `mousedown`   |
+| `mouseup`     |
+| `mouseleave`  |
+| `click`       |
+
+## Building the project
+
+The default behavior is to compile a Campfire project into single, valid webpage (`index.html`). 
+
+If Campfire detects a `header.html` or `footer.html` file in the working directory, 
+it will use the contents of each for their respective areas.
+
+```
+| -------------------- |
+|        header        | This can be blank if you want to embed the Campfire project
+| -------------------- |
+|         body         |
+| -------------------- |
+|      javascript      |
+| -------------------- |
+|        footer        | This can be blank if you want to embed the Campfire project
+| -------------------- |
+```
 
 # Contributing 
 
@@ -165,7 +183,7 @@ TODO
 
 The bones compiler works by parsing `main.bn`, then parsing each other `*.bn` file 
 that it counters by walking through files as they are linked. It is organized 
-by command---e.g., `build.rs` in the project's root handles the `bones build` command, 
+by command -- e.g., `build.rs` in the project's root handles the `bones build` command, 
 `publish.rs` handles the `bones publish` command, etc. 
 
 # Roadmap

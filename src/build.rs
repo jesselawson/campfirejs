@@ -40,6 +40,8 @@ pub fn do_build() -> Result<(), error::CampfireError> {
     }
   };
 
+  println!("Finished parsing file");
+
   let comrak_render_options = comrak::ComrakRenderOptions {
     unsafe_: true,
     ..Default::default()
@@ -53,10 +55,11 @@ pub fn do_build() -> Result<(), error::CampfireError> {
   // Convert to markdown
   for card in cardslist.iter_mut().enumerate() {
     let (_i,val):(usize, &mut Card) = card;
-    if !&val.name.as_ref().is_none() && !&val.raw_body.as_ref().is_none() { // If you don't check for this, you may get an error
+    if !&val.name.is_empty() && !&val.raw_body.is_empty() { // If you don't check for this, you may get an error
                                        // while trying to .unwrap() a None (in the below param to markdown_to_html)
-      val.set_html_body( comrak::markdown_to_html( &val.raw_body.as_ref().unwrap(), &comrak_options) );
+      val.set_html_body( comrak::markdown_to_html( &val.raw_body, &comrak_options) );
     }
+    //println!("{}", &val.html_body);
   }
   
   match compiler::compile_campfire_cards_into_document(&mut cardslist, &mut document) {
@@ -65,8 +68,11 @@ pub fn do_build() -> Result<(), error::CampfireError> {
       campfire_error(some_error);
     }
   }
-
-  // TODO: compiler::generate_javascript_for_document(&mut document) { ... }
+  /*
+  match compiler::generate_javascript_for_document(&mut document) {
+    Ok(()) => { println!("✅ Generated Javascript"); },
+    Err(some_error) => { campfire_error(some_error);}
+  }*/
 
   match compiler::build_campfire_project_dir(&mut document) {
     Ok (()) => { println!("✅ Project directory");},

@@ -1,8 +1,8 @@
 // A document is a collection of cards
 
-pub struct CampfireCustomVar {
-    pub key: Option<String>,
-    pub value: Option<String>
+pub struct LinkIndexItem {
+    pub link_element_id: String,            // The element ID of the link span itself
+    pub target_card_element_id: String      // The element ID of target card's div
 }
 
 pub struct Document {
@@ -10,7 +10,9 @@ pub struct Document {
     pub header_content: String,
     pub body_content: String,
     pub footer_content: String,
-    pub title: String
+    pub title: String,
+    pub link_index: Vec<LinkIndexItem>,
+    pub javascript: String
 }
 
 impl Document {

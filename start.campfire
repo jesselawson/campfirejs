@@ -2,23 +2,30 @@ $set @title = Welcome to Campfire
 
 $begin start
 
-Hello.
-
-%{How cool}(neato_burrito)
-
-// This is a comment 
 # Welcome to Campfire
 
-Campfire is an engine for dynamic content.
+Campfire is an engine for %{dynamic content}(storage).
 
-Content is stored on %{cards}(how_fun). Or like this. When you click a regular link, a new card is revealed underneath the currently active card. 
+$end
 
-Another kind of link is a clear link(basic_examples); a clear link will clear all cards before displaying the target card.
+$begin storage
+
+Content is stored on %{cards}(how_fun), which are described like this:
+
+```
+$begin start
+
+I am a Campfire file -- neat!
+
+$end
+```
+
+Super!
 
 $end
 
 $begin how_fun 
-Isn't this neat?
+Isn't this neat? Let's look at some %{basic examples}(basic_exmaples).
 $end
 
 $begin basic_examples 

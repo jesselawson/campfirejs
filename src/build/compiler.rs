@@ -23,17 +23,17 @@ fn card_exists(name:&str, known_card_names:&Vec<String>) -> bool {
 // Given a cardslist and a document, compiles all the cards from cardslist's 
 // and then populates the document
 pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&mut Document) -> Result<(), CampfireError>{
-  let mut campfire_link_counter = 0;
+  let mut campfire_link_counter:u32 = 0;
     let mut known_card_names:Vec<String> = Vec::<String>::new();
 
   for card in cardslist.iter_mut().enumerate() {
     let(_i,val):(usize,&mut Card) = card;
     println!("{:#?}", &val);
-    if !val.name.is_none() {
-        known_card_names.push(val.name.as_ref().unwrap().to_string()); 
+    if !val.name.is_empty() {
+        known_card_names.push(val.name.clone()); 
     }
                                               // Storing card names here so we have an 
-    //println!("--> Adding card {}...", val.name.as_ref().unwrap());            // array to search through for card_exists()
+    println!("--> Adding card {}...", &val.name);            // array to search through for card_exists()
   }
 
   // Populate compiled_body of each card
@@ -43,16 +43,16 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
     
     scratch.push_str("<div class=\"campfire-card\" id=\"");
     scratch.push_str("card_");
-    scratch.push_str(&val.name.as_ref().unwrap());
+    scratch.push_str(&val.name);
     scratch.push_str("\">");
 
-    if !&val.name.as_ref().is_none() {
+    if !&val.name.is_empty() {
         //println!("Compiling card {}...", &val.name.as_ref().unwrap());
         //println!("html_body: {}", &val.html_body.as_ref().unwrap());
         
         let content = ContentParser::parse(
             Rule::content, 
-            &val.html_body.as_ref().unwrap())
+            &val.html_body)
         .expect("failed to compile content for card")
         .next().unwrap();
 
@@ -87,7 +87,7 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
                             target_scratch.push_str(&pair.as_str())
                         },
                             _ => { 
-                                eprintln!("Compiler error: unknown expression type found in card '{:?}': {:#?}", &val.name.as_ref().unwrap(), pair.as_str());
+                                eprintln!("Compiler error: unknown expression type found in card '{:?}': {:#?}", &val.name, pair.as_str());
                                 return Err(CampfireError::UnknownExpressionType);
                             }
                         }
@@ -96,11 +96,11 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
                     // campfire_link_expressions are always 
                     // link{#?}_cardname_targetcard
                     link_tag_scratch.push_str("link");
-                    let current_campfire_link_counter = &campfire_link_counter.to_string();
-                    link_tag_scratch.push_str(&current_campfire_link_counter);
+                    let current_campfire_link_counter = &campfire_link_counter;
+                    link_tag_scratch.push_str(&current_campfire_link_counter.to_string());
                     campfire_link_counter+=1;
                     link_tag_scratch.push_str("_");
-                    link_tag_scratch.push_str(&val.name.as_ref().unwrap());
+                    link_tag_scratch.push_str(&val.name);
                     link_tag_scratch.push_str("_");
                     link_tag_scratch.push_str(&target_scratch);
                     link_tag_scratch.push_str("\">");
@@ -125,7 +125,7 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
     let _ = &val.set_compiled_body(scratch);
 
     // End of card for-loop
-    document.body_content.push_str(&val.compiled_body.as_ref().unwrap().to_string());
+    document.body_content.push_str(&val.compiled_body);
   }
 
   return Ok(())
@@ -158,7 +158,12 @@ pub fn build_campfire_project_dir(document:&mut Document) -> Result<(),CampfireE
 /// Goes through all Document.links_stack and generates javascript to attach to them
 /// which handles onclick events.
 pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), CampfireError> {
+    for link_item in document.link_index.iter() {
+        //link_item.link_element_id
+        //link_item.target_card_element_id
 
+        //document.getElementById(link_item.link_element_id).addEventListener('click')
+    }
 
     Ok(())
 }

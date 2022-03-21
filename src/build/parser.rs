@@ -2,6 +2,7 @@ use pest::Parser;
 use super::Card; 
 use super::CampfireError;
 use super::Document;
+use super::document::LinkIndexItem;
 use super::error::campfire_error;
 use std::path::Path;
 use std::fs;
@@ -73,19 +74,32 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
     //println!("{:#?}", file);
 
     let mut card = Card {
-        name: None,
-        source_filename: None,
-        raw_body: None,
-        html_body: None,
-        compiled_body: None
+        name: String::new(),
+        source_filename: String::new(),
+        raw_body: String::new(),
+        html_body: String::new(),
+        compiled_body: String::new()
     };
 
     let mut document = Document {
+        // The resultant html file
         filename: String::from("index.html"),
+
+        // Either default contents (in document.rs) or the contents of a header.html file
         header_content: String::new(),
+
+        // Derived from the compiled_body of all cards
         body_content: String::new(),
+
+        // Either default contents (in document.rs) or the contents of a footer.html file
         footer_content: String::new(),
         title: String::new(),
+
+        // When a new Campfire link is found, they're stored here for the javascript generator
+        link_index: Vec::<LinkIndexItem>::new(),
+
+        // The generated javascript
+        javascript: String::new()
     };
 
     match set_default_or_custom_header(&mut document) {
@@ -116,7 +130,8 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
                         // TODO -- continue getting $set details, and populate Document.
                         Rule::command_target => {
                             match pair.as_str() {
-                                "title" => {},
+                                "title" => {
+                                },
                                 _ => {
                                     return Err(CampfireError::UnknownCampfireSetCommand);
                                 }
@@ -141,7 +156,16 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
                             card.set_name(pair.as_str().to_string());
                         },
                         Rule::card_body => {
-                            card.set_raw_body(pair.as_str().to_string());
+                            card.add_raw_body(pair.as_str().to_string());
+                        },    
+                        // Reconstruct the code fences                                    
+                        Rule::code_block_lang => {
+                            card.add_raw_body("```".to_string());
+                            card.add_raw_body(pair.as_str().to_string());
+                        },                               
+                        Rule::code_block_value => {
+                            card.add_raw_body(pair.as_str().to_string());
+                            card.add_raw_body("```".to_string());
                         },
                         _ => { 
                             println!("Couldn't parse the following: {:?}", pair.as_rule());
