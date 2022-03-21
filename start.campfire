@@ -2,7 +2,7 @@ $set @title = Welcome to Campfire
 
 $begin start
 
-# Welcome to Campfire
+# Start Card
 
 Campfire is an engine for %{dynamic content}(storage).
 
@@ -10,23 +10,29 @@ $end
 
 $begin storage
 
+# Storage card
+
 Content is stored on %{cards}(how_fun), which are described like this:
-
-```
-$begin start
-
-I am a Campfire file -- neat!
-
-$end
-```
 
 Super!
 
 $end
 
 $begin how_fun 
-Isn't this neat? Let's look at some %{basic examples}(basic_exmaples).
+Isn't this neat? Let's look at some %{basic examples}(basic_examples).
+
+```
+$ begin whocares
+
+I am a Campfire file -- neat!
+
+$ end
+
+// Of course, this is only an example!
+```
+
 $end
+
 
 $begin basic_examples 
 

@@ -73,14 +73,6 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
 
     //println!("{:#?}", file);
 
-    let mut card = Card {
-        name: String::new(),
-        source_filename: String::new(),
-        raw_body: String::new(),
-        html_body: String::new(),
-        compiled_body: String::new()
-    };
-
     let mut document = Document {
         // The resultant html file
         filename: String::from("index.html"),
@@ -107,16 +99,24 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
         Err(some_error) => { 
             campfire_error(some_error);
         }
-    }
+    };
 
     match set_default_or_custom_footer(&mut document) {
     Ok(using) => { if using { println!("\t📄 Using custom footer template") } },
         Err(some_error) => { 
             campfire_error(some_error);
         }
-    }
+    };
 
     for line in file.into_inner() {
+
+        let mut card = Card {
+            name: String::new(),
+            source_filename: String::new(),
+            raw_body: String::new(),
+            html_body: String::new(),
+            compiled_body: String::new()
+        };
 
         card.set_source_filename( filename.to_string() );
 
@@ -130,7 +130,7 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
                         // TODO -- continue getting $set details, and populate Document.
                         Rule::command_target => {
                             match pair.as_str() {
-                                "title" => {
+                                "title" => {break;
                                 },
                                 _ => {
                                     return Err(CampfireError::UnknownCampfireSetCommand);
@@ -139,7 +139,7 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
 
                         },
                         Rule::command_value => {
-
+                            break;
                         },
                         _ => {
                             return Err(CampfireError::MalformedCampfireSetCommand);
@@ -158,19 +158,16 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
                         Rule::card_body => {
                             card.add_raw_body(pair.as_str().to_string());
                         },    
-                        // Reconstruct the code fences                                    
-                        Rule::code_block_lang => {
-                            card.add_raw_body("```".to_string());
-                            card.add_raw_body(pair.as_str().to_string());
-                        },                               
+                        // Reconstruct the code fences
+                        Rule::code_block_lang => {break;},
                         Rule::code_block_value => {
+                            card.add_raw_body("```".to_string());
                             card.add_raw_body(pair.as_str().to_string());
                             card.add_raw_body("```".to_string());
                         },
                         _ => { 
                             println!("Couldn't parse the following: {:?}", pair.as_rule());
                             return Err(CampfireError::UnknownExpressionType);
-
                         }
                     }
                     

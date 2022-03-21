@@ -4,6 +4,7 @@ use std::process::exit;
 use pest::Parser;                                                                                                                                                                                    
 use super::Card; 
 use super::Document;
+use super::document::LinkIndexItem;
 use super::error::CampfireError;
                                                                                                                                                                                                 
 #[derive(Parser)]                                                                                                                                                                                    
@@ -28,7 +29,7 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
 
   for card in cardslist.iter_mut().enumerate() {
     let(_i,val):(usize,&mut Card) = card;
-    println!("{:#?}", &val);
+    //println!("{:#?}", &val);
     if !val.name.is_empty() {
         known_card_names.push(val.name.clone()); 
     }
@@ -59,32 +60,51 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
         for expr in content.into_inner() {
             //println!("expr: {:#?}: {:#?}", expr.as_rule(), expr.as_str());
             match expr.as_rule() {
-                Rule::markdown_expression => { 
-                    //println!("-> Got markdown expression");
+                Rule::EOI => {},
+                Rule::text 
+                |Rule::string
+                |Rule ::mark_tag => {
                     scratch.push_str(expr.as_str());
                 },
-                Rule::campfire_link_expression => {
+                
+                Rule::campfire_link => {
                     //println!("-> Got campfire tag expression");
 
-                    let mut link_tag_scratch = String::from("<span class=\"campfire-card-label\" id=\"");
+                    let mut link_tag_scratch = String::from("<span class=\"campfire-card-label");
+                    if val.name.eq("start") {
+                        link_tag_scratch.push_str(" start-card");
+                    }
+                    link_tag_scratch.push_str("\" id=\"");
+                    
                     let mut label_scratch = String::from("");
                     let mut target_scratch = String::from("");
 
                     for pair in expr.into_inner() {
                         
                         match pair.as_rule() {
-                            Rule::label => { 
-                                //println!("--> Found label: {}", &pair.as_str());
-                                label_scratch.push_str(&pair.as_str());
+                            Rule::campfire_link_label => { 
+                                // Strip the first two and last one character from the string (the %{ and }).
+                                // This could likely be omitted if the grammar were rewritten to ignore the 
+                                // %{ and } of a link.
+                                let chars = &mut pair.as_str().chars();
+                                chars.next();
+                                chars.next();
+                                chars.next_back();
+                                label_scratch.push_str(&chars.as_str());
                             },
-                            Rule::target => { 
+                            Rule::campfire_link_target => { 
+                                // Strip the first and last character from the string; this could likely be 
+                                // omitted if the grammar were rewritten to ignore the ( and ) of a link.
+                                let chars = &mut pair.as_str().chars();
+                                chars.next();
+                                chars.next_back();
                                 //println!("--> Found target: {}", &pair.as_str());
                                 // Make sure card linked-to actually exists
-                                if !card_exists(&pair.as_str(), &known_card_names) {
+                                if !card_exists(&chars.as_str(), &known_card_names) {
                                     eprintln!("Compiler error: found link to non-existent card '{}'!", &pair.as_str());
                                     return Err(CampfireError::CardDoesNotExist);
                             }
-                            target_scratch.push_str(&pair.as_str())
+                            target_scratch.push_str(&chars.as_str())
                         },
                             _ => { 
                                 eprintln!("Compiler error: unknown expression type found in card '{:?}': {:#?}", &val.name, pair.as_str());
@@ -103,12 +123,17 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
                     link_tag_scratch.push_str(&val.name);
                     link_tag_scratch.push_str("_");
                     link_tag_scratch.push_str(&target_scratch);
-                    link_tag_scratch.push_str("\">");
-                    link_tag_scratch.push_str(&label_scratch);
-                    link_tag_scratch.push_str("</span>");
                     
                     scratch.push_str(&link_tag_scratch);
-                    //link_tag_scratch.push_str()
+                    scratch.push_str("\">");
+                    scratch.push_str(&label_scratch);
+                    scratch.push_str("</span>");
+                    
+                    // Store the link details for the javascript generator
+                    document.link_index.push(LinkIndexItem {
+                        link_element_id: link_tag_scratch,
+                        target_card_element_id: target_scratch
+                    });
                 },
                 //Rule::campfire_cmd_expression => {},
                 _ => { 
@@ -120,7 +145,7 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
         //val.set_compiled_body(compile_content(&val.compiled_body.as_ref().unwrap()).unwrap());
     }
 
-    scratch.push_str("</div>");
+    scratch.push_str("</div>\n");
 
     let _ = &val.set_compiled_body(scratch);
 

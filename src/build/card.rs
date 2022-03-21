@@ -1,5 +1,6 @@
 #[allow(dead_code)]
 #[derive(Debug,Clone)]
+
 pub struct Card {
   pub source_filename: String,
   pub name: String,     // The Blocks name, or "unique identifier"

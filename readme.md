@@ -197,3 +197,51 @@ TODO
 
 - Group links together so that when one is clicked, the rest are no longer available. 
   This is a game feature; is this necessary? (could this be achieved with a plugin-esque add-on?)
+
+
+Campfiresphere(?)
+
+What if you could register a link online and anytime someone linked to it, it would 
+display YOUR card? 
+
+e.g.:
+
+```campfire
+This is %{a link}(^windex).
+```
+
+The `^` character means "remote" link. 
+
+Remote links are registered on a first-come, first-serve basis. No squatting.
+
+If I register `^jesse`, That means that someone grabbing `{^jesse}` would actually
+be getting `{^jesse/home}`. Since I own `^jesse`, I can make any number of other cards 
+in my account, accessible by `{^jesse/card_name}`. 
+
+I can mark cards private. If a user nagivates to one of my private cards OR a 
+card that does not exist, it pulls my 404 card. 
+
+- [Feature] You can include a campfire file in another campfire fire. 
+
+```
+my-proj/
+  start.campfire
+  header.html
+  footer.html
+
+
+```
+
+- [Enhancement] header/footer should just be template.html. When will you want a 
+  custom header but not footer? Just have a special tag that MUST exist in the file 
+  exactly once, and if that is the case, then it's a valid template. 
+  It can literally be the only contents of the file if you want. 
+
+
+- [marketing] Instant "message from" them. You're reading an article and see a link to 
+my name. Instead of that link going to another website, it modifies the existing 
+site, showing more information but from the resource itself. 
+
+Instead of "go here to read about all this," it's "Here. Here is exactly the card you're 
+looking for." 
+
