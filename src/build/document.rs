@@ -26,13 +26,12 @@ impl Document {
                 <link rel="stylesheet" src="style.css"/>
             </head>
             <body>
-                $$cards_container_contents$$
         "##);
     }
 
     pub fn use_default_footer(&mut self) {
         self.footer_content =  String::from(r##"
-                <script src="campfire.js"/>
+                <script src="campfire.js"></script>
             </body>
         </html>
         "##);

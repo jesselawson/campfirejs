@@ -217,7 +217,7 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
 
     let mut javascript = String::new();
 
-    javascript.push_str("window.onload = function() {\n");
+    javascript.push_str("function campfire_init() {");
 
     let mut link_counter:u32 = 0;
 
@@ -243,16 +243,20 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
         // else {
             
         javascript.push_str(&link_element(&link_counter));
-        javascript.push_str(r##".addEventListener('click', function() { 
-                link_element.classList.add('cf-clicked');
-                target_element.classList.add('cf-fade-in');
-            });
-            "##);
+        javascript.push_str(".addEventListener('click', function() {");
+        javascript.push_str(&link_element(&link_counter));
+        javascript.push_str(".classList.add('cf-clicked');");
+        javascript.push_str("document.getElementById(\"card_");
+        javascript.push_str(&link_item.target_card_element_id);
+        javascript.push_str("\").classList.add('cf-fade-in');});");
+        
+
         // }
         link_counter+=1;
     }
 
-    javascript.push_str("}"); // To complete the window.onload = function() {
+    javascript.push_str("}"); // end capfire_init function
+    javascript.push_str("document.addEventListener('DOMContentLoaded', campfire_init);");
 
     document.javascript.push_str(&javascript);
 
