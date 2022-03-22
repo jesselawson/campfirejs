@@ -1,6 +1,6 @@
 para = { ANY* ~ NEWLINE{2} }
 expr = _{ img | link | campfire_link | mark }
-text = { (!(expr | NEWLINE) ~ ANY)+ }
+text = { (!(expr) ~ ANY)+ }
 code = _{ 
   PUSH("```") ~ code_block_lang ~ code_block_value ~ PUSH("```")
 }

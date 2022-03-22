@@ -159,7 +159,9 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
                             card.add_raw_body(pair.as_str().to_string());
                         },    
                         // Reconstruct the code fences
-                        Rule::code_block_lang => {break;},
+                        Rule::code_block_lang => {
+                            card.add_raw_body(pair.as_str().to_string());
+                        },
                         Rule::code_block_value => {
                             card.add_raw_body("```".to_string());
                             card.add_raw_body(pair.as_str().to_string());
