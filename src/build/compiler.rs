@@ -70,11 +70,14 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
                 Rule::campfire_link => {
                     //println!("-> Got campfire tag expression");
 
-                    let mut link_tag_scratch = String::from("<span class=\"campfire-card-label");
+                    let mut link_tag_scratch = String::from("");
+                    
+                    scratch.push_str("<span class=\"campfire-card-label");
+                    
                     if val.name.eq("start") {
-                        link_tag_scratch.push_str(" start-card");
+                        scratch.push_str(" start-card");
                     }
-                    link_tag_scratch.push_str("\" id=\"");
+                    scratch.push_str("\" id=\"");
                     
                     let mut label_scratch = String::from("");
                     let mut target_scratch = String::from("");
@@ -128,6 +131,8 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
                     scratch.push_str("\">");
                     scratch.push_str(&label_scratch);
                     scratch.push_str("</span>");
+
+                    println!("-> {}", &link_tag_scratch);
                     
                     // Store the link details for the javascript generator
                     document.link_index.push(LinkIndexItem {
@@ -157,25 +162,49 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
 }
 
 pub fn build_campfire_project_dir(document:&mut Document) -> Result<(),CampfireError> {
-    // Write compiled_body for all cards to file
-  let path = std::path::Path::new("project/index.html");
-  let prefix = path.parent().unwrap_or_else(|| std::path::Path::new("project"));
   
-  match std::fs::create_dir_all(prefix) {
-    Ok(_) => {  },
-    Err(err) => { eprintln!("Error creating project directory: {}", err); exit(1);}
-  }
-  
-  let mut file_pointer= match std::fs::File::create(path) {
-    Ok(file) => { file },
-    _ => { println!("Unable to create output file!"); exit(1); }
-  };
-  
-  
-  match file_pointer.write(document.get_final_file_contents().as_bytes()) {
-    Ok(_) => {},
-    Err(err) => { eprintln!("Error writing to project file: {}", err); exit(1);}
-  }
+    {  // Write to index.html
+        let path = std::path::Path::new("project/index.html");
+        let prefix = path.parent().unwrap_or_else(|| std::path::Path::new("project"));
+
+        match std::fs::create_dir_all(prefix) {
+        Ok(_) => {  },
+        Err(err) => { eprintln!("Error creating project directory: {}", err); exit(1);}
+        }
+
+        let mut file_pointer= match std::fs::File::create(path) {
+        Ok(file) => { file },
+        _ => { println!("Unable to create output file!"); exit(1); }
+        };
+
+
+        match file_pointer.write(document.get_final_file_contents().as_bytes()) {
+        Ok(_) => {},
+        Err(err) => { eprintln!("Error writing to project file: {}", err); exit(1);}
+        }
+    }
+
+    {  // Write campfire.js
+        let path = std::path::Path::new("project/campfire.js");
+        let prefix = path.parent().unwrap_or_else(|| std::path::Path::new("project"));
+
+        match std::fs::create_dir_all(prefix) {
+            Ok(_) => {  },
+            Err(err) => { eprintln!("Error creating project directory: {}", err); exit(1);}
+        }
+
+        let mut file_pointer= match std::fs::File::create(path) {
+            Ok(file) => { file },
+            _ => { println!("Unable to write to campfire.js file!"); exit(1); }
+        };
+
+
+        match file_pointer.write(document.get_final_javascript_contents().as_bytes()) {
+            Ok(_) => {},
+            Err(err) => { eprintln!("Error writing to campfire.js file: {}", err); exit(1);}
+        }
+    }
+
     return Ok(())
 }
 
@@ -183,12 +212,49 @@ pub fn build_campfire_project_dir(document:&mut Document) -> Result<(),CampfireE
 /// Goes through all Document.links_stack and generates javascript to attach to them
 /// which handles onclick events.
 pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), CampfireError> {
-    for link_item in document.link_index.iter() {
-        //link_item.link_element_id
-        //link_item.target_card_element_id
+    
+    // TODO: check for on
 
-        //document.getElementById(link_item.link_element_id).addEventListener('click')
+    let mut javascript = String::new();
+
+    javascript.push_str("window.onload = function() {\n");
+
+    let mut link_counter:u32 = 0;
+
+    let link_element = |link_counter:&u32| {
+        let mut str = String::from("link");
+        str.push_str(link_counter.to_string().as_str());
+        str.push_str("_element");
+        str
+    };
+
+    for link_item in document.link_index.iter() {
+        
+        // let link##_element = document.getElementById("link##_<link_element_id>");
+        javascript.push_str("let link");
+        let current_link_counter = &link_counter;
+        javascript.push_str(&current_link_counter.to_string());
+        javascript.push_str("_element = document.getElementById(\"");
+        javascript.push_str(&link_item.link_element_id);
+        javascript.push_str("\");");
+        
+        // TODO: Look for for a plugins/link.js file to load here instead!
+        // if template, then javascript.push_str(the contents of the template file).
+        // else {
+            
+        javascript.push_str(&link_element(&link_counter));
+        javascript.push_str(r##".addEventListener('click', function() { 
+                link_element.classList.add('cf-clicked');
+                target_element.classList.add('cf-fade-in');
+            });
+            "##);
+        // }
+        link_counter+=1;
     }
+
+    javascript.push_str("}"); // To complete the window.onload = function() {
+
+    document.javascript.push_str(&javascript);
 
     Ok(())
 }

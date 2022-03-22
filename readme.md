@@ -152,11 +152,11 @@ event functions can be overridden:
 
 | Event type    | Global function 
 | ------------- | ---------------------
-| `mouseenter`  | `window.Campfire.next
-| `mousedown`   |
-| `mouseup`     |
-| `mouseleave`  |
-| `click`       |
+| `mouseenter`  | `window.Campfire.next_card_mouseenter`
+| `mousedown`   | `window.Campfire.next_card_mousedown`
+| `mouseup`     | `window.Campfire.next_card_mouseup`
+| `mouseleave`  | `window.Campfire.next_card_mouseleave`
+| `click`       | `window.Campfire.next_card_click`
 
 ## Building the project
 
@@ -245,3 +245,12 @@ site, showing more information but from the resource itself.
 Instead of "go here to read about all this," it's "Here. Here is exactly the card you're 
 looking for." 
 
+- [Community] For people building plugins, have an arg command that emits 
+  document.link_index as JSON so that they can generate whatever they need to generate.
+
+- If I create a system where anyone can define the javascript that is generated 
+  when a link is created, that would give people the opportunity to define their own 
+  Campfire-esque experience. Campfire is a community. Share what you build with 
+  Campfire -- and how you've built Campfire itself. 
+
+  No reason why this can't be a future feature. Just requires a bit of overhaul.

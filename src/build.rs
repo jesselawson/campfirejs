@@ -63,19 +63,19 @@ pub fn do_build() -> Result<(), error::CampfireError> {
   }
   
   match compiler::compile_campfire_cards_into_document(&mut cardslist, &mut document) {
-    Ok(()) => { println!("✅ {}", &main_file_name); },
+    Ok(()) => { println!("Parse {}... ✅", &main_file_name); },
     Err(some_error) => {
       campfire_error(some_error);
     }
   }
-  /*
+  
   match compiler::generate_javascript_for_document(&mut document) {
-    Ok(()) => { println!("✅ Generated Javascript"); },
+    Ok(()) => { println!("Generate Javascript... ✅"); },
     Err(some_error) => { campfire_error(some_error);}
-  }*/
+  }
 
   match compiler::build_campfire_project_dir(&mut document) {
-    Ok (()) => { println!("✅ Project directory");},
+    Ok (()) => { println!("Build project directory... ✅");},
     Err(some_error) => {
       campfire_error(some_error);
     }

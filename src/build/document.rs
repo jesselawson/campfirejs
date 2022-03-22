@@ -47,6 +47,14 @@ impl Document {
 
         output
     }
+
+    pub fn get_final_javascript_contents(&mut self) -> String {
+        let mut output = String::new();
+
+        output.push_str(&self.javascript);
+        
+        output
+    }
 }
 
 
