@@ -1,0 +1,27 @@
+.campfire-card-container {
+    width: 600px;
+    margin: auto;
+}   
+
+.campfire-card {
+    padding: .87em;
+    border: 1px solid #333fff;
+    border-radius: 1px;
+    opacity: 0;
+    display: none;
+}
+
+.campfire-card-label {
+    text-color: blue;
+    text-decoration: underline;
+    transition: text-color .5s;
+}
+
+.cf-clicked {
+   text-color: inherit;
+   text-decoration: inherit;
+}
+
+.cf-fade-in {
+
+}

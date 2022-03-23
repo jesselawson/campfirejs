@@ -42,7 +42,11 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
     let mut scratch = String::from("");
     let(_i,val):(usize, &mut Card) = card;
     
-    scratch.push_str("<div class=\"campfire-card\" id=\"");
+    scratch.push_str("<div class=\"campfire-card");
+    if val.name.eq("start") {
+        scratch.push_str(" start-card");
+    }
+    scratch.push_str("\" id=\"");
     scratch.push_str("card_");
     scratch.push_str(&val.name);
     scratch.push_str("\">");
@@ -74,9 +78,6 @@ pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&
                     
                     scratch.push_str("<span class=\"campfire-card-label");
                     
-                    if val.name.eq("start") {
-                        scratch.push_str(" start-card");
-                    }
                     scratch.push_str("\" id=\"");
                     
                     let mut label_scratch = String::from("");

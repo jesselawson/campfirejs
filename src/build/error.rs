@@ -18,7 +18,9 @@ pub enum CampfireError {
   UnableToReadFooterFile,
   UnableToReadHeaderFile,
   EmptyHeaderFileFound,
-  EmptyFooterFileFound
+  EmptyFooterFileFound,
+  EmptyCSSFileFound,
+  UnableToReadCSSFile
 }
 
 // TODO: When there's a specific error on a specific line, 
@@ -33,8 +35,10 @@ pub fn campfire_error(err:CampfireError) {
     CampfireError::UnknownCampfireSetCommand => "That $set target does not exist! Omit the @ and you can set a custom var instead.",
     CampfireError::UnableToReadFooterFile => "A 'footer.html' template was found, but it could not be read.",
     CampfireError::UnableToReadHeaderFile => "A 'header.html' template was found, but it could not be read.",
+    CampfireError::UnableToReadCSSFile => "A 'style.css' template was found, but it could not be read.",
     CampfireError::EmptyHeaderFileFound => "It looks like 'header.html' is empty. Please use a valid template.",
-    CampfireError::EmptyFooterFileFound => "It looks like 'footer.html' is empty. Please use a valid template."
+    CampfireError::EmptyFooterFileFound => "It looks like 'footer.html' is empty. Please use a valid template.",
+    CampfireError::EmptyCSSFileFound => "It looks like 'style.css' is empty. Please use a valid template."
   };
 
   eprintln!("🌬️ Error: {}", msg);

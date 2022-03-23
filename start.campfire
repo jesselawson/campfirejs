@@ -2,15 +2,19 @@ $set @title = Welcome to Campfire
 
 $begin start
 
-# Start Card
+# Campfire is an interaction system built on top of Markdown.
 
-Campfire is an engine for %{dynamic content}(storage).
+Organize your content in **cards**, then link to different cards with %{hyperlinks}(start2).
 
 $end
 
-$begin storage
+$begin start2
 
-# Storage card
+## Cards
+
+
+
+
 
 Content is stored on %{cards}(how_fun), which are described like this:
 

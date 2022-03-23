@@ -63,6 +63,33 @@ fn set_default_or_custom_footer(document:&mut Document) -> Result<bool, Campfire
     }
 }
 
+// If a style.css is found, it's loaded AFTER the default Campfire CSS (in case 
+// you want to override it)
+fn set_css_and_check_for_custom_css(document:&mut Document) -> Result<bool, CampfireError> {
+    let css_file = Path::new("style.css");
+    if css_file.exists() {
+        let content = match fs::read_to_string(css_file) {
+            Ok(file_as_string) => { file_as_string },
+            Err(error) => {
+                eprintln!("{}", error);
+                return Err(CampfireError::UnableToReadCSSFile);
+            }
+        };
+        
+        if !content.is_empty() {
+            document.css_content = content;
+            Ok(true)
+        } else {
+            eprintln!("CSS template found, but it's empty!");
+            return Err(CampfireError::EmptyCSSFileFound);
+        }
+
+    } else {
+        
+        Ok(false)
+    }
+}
+
 /// Returns a Document that contains any config vars that were declared, as well 
 /// as the content of the header, body, and footer
 pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, cardslist:&mut Vec<Card>) -> Result<Document, CampfireError>{
@@ -85,6 +112,7 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
 
         // Either default contents (in document.rs) or the contents of a footer.html file
         footer_content: String::new(),
+        css_content: String::new(),
         title: String::new(),
 
         // When a new Campfire link is found, they're stored here for the javascript generator
@@ -92,20 +120,6 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
 
         // The generated javascript
         javascript: String::new()
-    };
-
-    match set_default_or_custom_header(&mut document) {
-        Ok(using) => { if using { println!("\t📄 Using custom header template") } },
-        Err(some_error) => { 
-            campfire_error(some_error);
-        }
-    };
-
-    match set_default_or_custom_footer(&mut document) {
-    Ok(using) => { if using { println!("\t📄 Using custom footer template") } },
-        Err(some_error) => { 
-            campfire_error(some_error);
-        }
     };
 
     for line in file.into_inner() {
@@ -122,24 +136,14 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
 
         match line.as_rule() {
             // Predefined commands
-            Rule::campfire_set_command => {
+            Rule::set_title_command => {
 
                 let inner_pairs = line.into_inner();
                 for pair in inner_pairs {
                     match pair.as_rule() {
                         // TODO -- continue getting $set details, and populate Document.
-                        Rule::command_target => {
-                            match pair.as_str() {
-                                "title" => {break;
-                                },
-                                _ => {
-                                    return Err(CampfireError::UnknownCampfireSetCommand);
-                                }
-                            }
-
-                        },
                         Rule::command_value => {
-                            break;
+                            document.title = pair.as_str().to_string();
                         },
                         _ => {
                             return Err(CampfireError::MalformedCampfireSetCommand);
@@ -182,6 +186,27 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
             _ => { println!("Couldn't match {:?}", line.as_rule()) }
         }
     }
+
+    match set_css_and_check_for_custom_css(&mut document) {
+        Ok(using) => { if using { println!("\t📄 Using custom css") } },
+        Err(some_error) => { 
+            campfire_error(some_error);
+        }
+    };
+
+    match set_default_or_custom_header(&mut document) {
+        Ok(using) => { if using { println!("\t📄 Using custom header template") } },
+        Err(some_error) => { 
+            campfire_error(some_error);
+        }
+    };
+
+    match set_default_or_custom_footer(&mut document) {
+    Ok(using) => { if using { println!("\t📄 Using custom footer template") } },
+        Err(some_error) => { 
+            campfire_error(some_error);
+        }
+    };
 
     Ok(document)
 

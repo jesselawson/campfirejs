@@ -10,6 +10,7 @@ pub struct Document {
     pub header_content: String,
     pub body_content: String,
     pub footer_content: String,
+    pub css_content: String,
     pub title: String,
     pub link_index: Vec<LinkIndexItem>,
     pub javascript: String
@@ -18,12 +19,20 @@ pub struct Document {
 impl Document {
 
     /// Sets the header to be a pre-loaded default
+    /// NOTE: Ensure self.css_content is set, because this uses it!
     pub fn use_default_header(&mut self) {
         self.header_content = String::from(r##"
         <html>
             <head>
-                <title>My Campfire App</title>
-                <link rel="stylesheet" src="style.css"/>
+                <title>"##);
+        self.header_content.push_str(&self.title);
+        self.header_content.push_str(r##"</title>
+                <style>"##);
+        self.header_content.push_str(&self.css_content);
+        self.use_default_css();
+        self.header_content.push_str(r##"
+        
+                </style>
             </head>
             <body>
         "##);
@@ -34,6 +43,47 @@ impl Document {
                 <script src="campfire.js"></script>
             </body>
         </html>
+        "##);
+    }
+
+    pub fn use_default_css(&mut self) {
+        self.header_content.push_str(r##"
+        .campfire-card-container {
+            width: 600px;
+            margin: auto;
+        }   
+
+        .campfire-card {
+            padding: .87em;
+            border: 1px solid #333fff;
+            border-radius: 1px;
+            opacity: 0;
+            display: none;
+            transition: opacity .71s;
+        }
+
+        .campfire-card-label {
+            text-color: blue;
+            text-decoration: underline;
+            transition: text-color .5s;
+            cursor: pointer;
+        }
+
+        .start-card {
+            opacity: 1;
+            display: block;
+        }
+
+        .cf-clicked {
+           text-color: inherit;
+           text-decoration: inherit;
+           cursor: inherit;
+        }
+
+        .cf-fade-in {
+            display: block;
+            opacity: 1;
+        }
         "##);
     }
 
