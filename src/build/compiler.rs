@@ -2,6 +2,8 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 use std::process::exit;
+use regex;
+use regex::Regex;
 
 use pest::Parser;                                                                                                                                                                                    
 use super::Card; 
@@ -159,11 +161,14 @@ pub fn compile_campfire_cards_into_document(document:&mut Document) -> Result<()
                     scratch.push_str("</span>");
 
                     println!("-> {}", &link_tag_scratch);
+
+                    let name:String = String::from(&val.name);
                     
                     // Store the link details for the javascript generator
                     document.link_index.push(LinkIndexItem {
                         link_element_id: link_tag_scratch,
-                        target_card_element_id: target_scratch
+                        target_card_element_id: target_scratch,
+                        target_card_name: name
                     });
                 },
                 //Rule::campfire_cmd_expression => {},
@@ -180,8 +185,11 @@ pub fn compile_campfire_cards_into_document(document:&mut Document) -> Result<()
 
     let _ = &val.set_compiled_body(scratch);
 
-    // End of card for-loop
-    document.body_content.push_str(&val.compiled_body);
+    // End of card for-loop; only render the start card in index.html, since the other 
+    // cards will be dynamically appended when a link targeting them is clicked.
+    if val.name.eq("start") {
+        document.body_content.push_str(&val.compiled_body);
+    }
   }
 
   return Ok(())
@@ -260,6 +268,24 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
     let onclick_plugin_contents = check_for_plugin_and_load_if_found(
         "plugins/onclick.js").unwrap();
 
+    // Build a cards_index
+    javascript.push_str("const campfire_cards = new Map();");
+    for card in document.cards_list.iter() {
+        javascript.push_str("campfire_cards.set('");
+        javascript.push_str(&card.name);
+        javascript.push_str("', \"");
+        // Need to remove everything between > and < so we have one long single string,
+        // then, in order for the javascript to be valid, we need to replace all 
+        // quotes with \" and then replace all newlines with literal slash-n ("\n").
+        // These are rendered into the html string and then appended as html to #campfire-card-container.
+        let re = Regex::new(r"(?m)>\s+?<").unwrap();
+        let step1 = re.replace_all(&card.compiled_body, "><").to_string();
+        let step2 = &str::replace(&step1, '"', "\\\"");
+        let step3 = &str::replace(&step2, '\n', "\\n");
+        javascript.push_str(step3);
+        javascript.push_str("\");");
+    }
+
     for link_item in document.link_index.iter() {
         
         // let link##_element = document.getElementById("link##_<link_element_id>");
@@ -284,9 +310,15 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
         javascript.push_str(&link_element(&link_counter));
         javascript.push_str(";let target_card_element = document.getElementById(\"card_");
         javascript.push_str(&link_item.target_card_element_id);
-        javascript.push_str("\");\n");
-            
-        //TODO: onclick.js exists? Load it and inject it.
+        javascript.push_str("\");let target_card_html_content = ");
+        javascript.push_str("campfire_cards.get(\"");
+        javascript.push_str(&link_item.target_card_name);
+        javascript.push_str("\");let campfire_card_container = document.getElementById('campfire-card-container');\n");
+
+        // TODO: add let target_card_contents = "card.compiled_body" as html to add to innerHTML
+        //  that way we can add it to the container in the plugin file. 
+        
+        
         if !onclick_plugin_contents.is_empty() {
             javascript.push_str(&onclick_plugin_contents);
             javascript.push_str("\n");

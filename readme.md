@@ -285,3 +285,9 @@ return campfire_error(CampfireError::InvalidFile, &filename);
 
 
 ```
+
+- [Feature/Bug] When a link is clicked, search the link index for all other links to that card 
+  and mark them as clicked.
+  (Perhaps this should be configurable? I can forsee interesting reasons for wanting to be 
+  able to render the same card many times (for example, when teaching a concept -- instead of 
+  scrolling back up, just render the content again?))

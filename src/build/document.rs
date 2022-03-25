@@ -4,7 +4,8 @@ use super::card::Card;
 
 pub struct LinkIndexItem {
     pub link_element_id: String,            // The element ID of the link span itself
-    pub target_card_element_id: String      // The element ID of target card's div
+    pub target_card_element_id: String,     // The element ID of target card's div
+    pub target_card_name: String            // The name of the card to be rendered
 }
 
 pub struct Document {
@@ -38,7 +39,7 @@ impl Document {
                 </style>
             </head>
             <body>
-            <div class="campfire-card-container">
+            <div id="campfire-card-container">
         "##);
     }
 
@@ -53,7 +54,7 @@ impl Document {
 
     pub fn use_default_css(&mut self) {
         self.header_content.push_str(r##"
-        .campfire-card-container {
+        #campfire-card-container {
             width: 600px;
             margin: auto;
         }   
