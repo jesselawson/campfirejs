@@ -28,7 +28,7 @@ Hello, world!
 $end
 ```
 
-Campfire cards start with the `$begin` %{command}(commands), which takes one argument: an 
+Campfire cards start with the `$begin`  %{command}(commands), which takes one argument: an 
 alphanumeric card identifier. This identifer is unique to the card and is used 
 when creating %{links}(links).
 

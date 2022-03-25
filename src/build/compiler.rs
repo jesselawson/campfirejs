@@ -253,21 +253,6 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
 
     let mut javascript = String::new();
 
-    javascript.push_str("function campfire_init() {");
-
-    let mut link_counter:u32 = 0;
-
-    // Use this to give you a string of the link element
-    let link_element = |link_counter:&u32| {
-        let mut str = String::from("link");
-        str.push_str(link_counter.to_string().as_str());
-        str.push_str("_element");
-        str
-    };
-
-    let onclick_plugin_contents = check_for_plugin_and_load_if_found(
-        "plugins/onclick.js").unwrap();
-
     // Build a cards_index
     javascript.push_str("const campfire_cards = new Map();");
     for card in document.cards_list.iter() {
@@ -286,6 +271,21 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
         javascript.push_str("\");");
     }
 
+    javascript.push_str("function campfire_init() {");
+
+    let mut link_counter:u32 = 0;
+
+    // Use this to give you a string of the link element
+    let link_element = |link_counter:&u32| {
+        let mut str = String::from("link");
+        str.push_str(link_counter.to_string().as_str());
+        str.push_str("_element");
+        str
+    };
+
+    let onclick_plugin_contents = check_for_plugin_and_load_if_found(
+        "plugins/onclick.js").unwrap();
+
     for link_item in document.link_index.iter() {
         
         // let link##_element = document.getElementById("link##_<link_element_id>");
@@ -293,9 +293,9 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
         let current_link_counter = &link_counter;
         
         javascript.push_str(&current_link_counter.to_string());
-        javascript.push_str("_element = document.getElementById(\"");
+        javascript.push_str("_element = () => { return document.getElementById(\"");
         javascript.push_str(&link_item.link_element_id);
-        javascript.push_str("\");");
+        javascript.push_str("\"); };");
         
         // TODO: Look for for a plugins/onclick.js file to load here instead!
         // if template, then javascript.push_str(the contents of the template file).
@@ -311,7 +311,7 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
         javascript.push_str(&link_item.link_element_id);
         javascript.push_str("') { let link_element = () => { return ");
         javascript.push_str(&link_element(&link_counter));
-        javascript.push_str("; };");
+        javascript.push_str("(); };");
         javascript.push_str(";let target_card_element = () => { return document.getElementById(\"card_");
         javascript.push_str(&link_item.target_card_element_id);
         javascript.push_str("\");}; let target_card_html_content = () => {");
