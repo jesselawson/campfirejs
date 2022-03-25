@@ -139,8 +139,13 @@ The parser reads the *.campfire file in two stages:
 ## Compiling
 
 The compiler is responsible for compiling the markdown and campfire expressions.
+They're stored in the document's card vector's compiled_body.
 
 ## Generating Javascript
+
+For every link, we generate a new HTML div element and set the innerHTML to be 
+the content's of the linked card's compiled_body. This means that any card that 
+does not have a link to it will not be rendered. 
 
 ### Global variables
 
@@ -254,3 +259,29 @@ looking for."
   Campfire -- and how you've built Campfire itself. 
 
   No reason why this can't be a future feature. Just requires a bit of overhaul.
+
+
+  - [Issue] If text exists between a card, the error is not helpful:
+
+  thread 'main' panicked at 'unsuccessful parse: Error { variant: ParsingError { positives: [EOI, card], negatives: [] }, location: Pos(771), line_col: Pos((49, 1)), path: None, line: "// Of course, this is only an example!␊", continued_line: None }', src/build/parser.rs:98:10
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+- [Enhancement] Refactor CampfireError handling; instead of 
+
+```rust
+pub enum CampfireError {
+  ...
+};
+```
+
+It should be 
+
+```rust
+pub enum CampfireError {
+  ...
+};
+
+return campfire_error(CampfireError::InvalidFile, &filename);
+
+
+```

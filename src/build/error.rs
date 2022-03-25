@@ -17,9 +17,11 @@ pub enum CampfireError {
   UnknownCampfireSetCommand,
   UnableToReadFooterFile,
   UnableToReadHeaderFile,
+  UnableToReadPluginFile,
   EmptyHeaderFileFound,
   EmptyFooterFileFound,
   EmptyCSSFileFound,
+  EmptyPluginFileFound,
   UnableToReadCSSFile
 }
 
@@ -38,7 +40,9 @@ pub fn campfire_error(err:CampfireError) {
     CampfireError::UnableToReadCSSFile => "A 'style.css' template was found, but it could not be read.",
     CampfireError::EmptyHeaderFileFound => "It looks like 'header.html' is empty. Please use a valid template.",
     CampfireError::EmptyFooterFileFound => "It looks like 'footer.html' is empty. Please use a valid template.",
-    CampfireError::EmptyCSSFileFound => "It looks like 'style.css' is empty. Please use a valid template."
+    CampfireError::EmptyCSSFileFound => "It looks like 'style.css' is empty. Please use a valid template.",
+    CampfireError::EmptyPluginFileFound => ":(",
+    CampfireError::UnableToReadPluginFile => "A plugin was found but it could not be read."
   };
 
   eprintln!("🌬️ Error: {}", msg);

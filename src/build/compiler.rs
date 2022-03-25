@@ -1,4 +1,6 @@
+use std::fs;
 use std::io::Write;
+use std::path::Path;
 use std::process::exit;
 
 use pest::Parser;                                                                                                                                                                                    
@@ -21,24 +23,47 @@ fn card_exists(name:&str, known_card_names:&Vec<String>) -> bool {
     return false;
 }
 
+/// Returns the contents of the plugin file as a string if found, or an empty string if not
+fn check_for_plugin_and_load_if_found(plugin_path:&str) -> Result<String, CampfireError> {
+    let plugin_file = Path::new(plugin_path);
+    
+    if plugin_file.exists() {
+        println!("\t📄 Using onclick.js plugin");
+        let content = match fs::read_to_string(plugin_file) {
+            Ok(file_as_string) => { file_as_string },
+            Err(error) => {
+                eprintln!("{}", error);
+                return Err(CampfireError::UnableToReadPluginFile);
+            }
+        };
+        
+        Ok(content)
+
+    } else {
+        Ok(String::from(""))
+    }
+}
+
 // Given a cardslist and a document, compiles all the cards from cardslist's 
 // and then populates the document
-pub fn compile_campfire_cards_into_document(cardslist:&mut Vec<Card>, document:&mut Document) -> Result<(), CampfireError>{
+pub fn compile_campfire_cards_into_document(document:&mut Document) -> Result<(), CampfireError>{
   let mut campfire_link_counter:u32 = 0;
-    let mut known_card_names:Vec<String> = Vec::<String>::new();
 
-  for card in cardslist.iter_mut().enumerate() {
+  // Storing card names here so we have an array to search through for card_exists()
+  let mut known_card_names:Vec<String> = Vec::<String>::new();
+
+  for card in document.cards_list.iter_mut().enumerate() {
     let(_i,val):(usize,&mut Card) = card;
     //println!("{:#?}", &val);
     if !val.name.is_empty() {
         known_card_names.push(val.name.clone()); 
     }
-                                              // Storing card names here so we have an 
-    println!("--> Adding card {}...", &val.name);            // array to search through for card_exists()
+                                                                
+    println!("--> Compiling card {}...", &val.name);
   }
 
   // Populate compiled_body of each card
-  for card in cardslist.iter_mut().enumerate() {
+  for card in document.cards_list.iter_mut().enumerate() {
     let mut scratch = String::from("");
     let(_i,val):(usize, &mut Card) = card;
     
@@ -185,6 +210,8 @@ pub fn build_campfire_project_dir(document:&mut Document) -> Result<(),CampfireE
         }
     }
 
+    // TODO: Create a CLI flag that lets you determine how this is done (e.g., 
+    // something like campfire build --singlefile (to inject it in a script tag in index.html))
     {  // Write campfire.js
         let path = std::path::Path::new("project/campfire.js");
         let prefix = path.parent().unwrap_or_else(|| std::path::Path::new("project"));
@@ -222,6 +249,7 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
 
     let mut link_counter:u32 = 0;
 
+    // Use this to give you a string of the link element
     let link_element = |link_counter:&u32| {
         let mut str = String::from("link");
         str.push_str(link_counter.to_string().as_str());
@@ -229,29 +257,43 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
         str
     };
 
+    let onclick_plugin_contents = check_for_plugin_and_load_if_found(
+        "plugins/onclick.js").unwrap();
+
     for link_item in document.link_index.iter() {
         
         // let link##_element = document.getElementById("link##_<link_element_id>");
         javascript.push_str("let link");
         let current_link_counter = &link_counter;
+        
         javascript.push_str(&current_link_counter.to_string());
         javascript.push_str("_element = document.getElementById(\"");
         javascript.push_str(&link_item.link_element_id);
         javascript.push_str("\");");
         
-        // TODO: Look for for a plugins/link.js file to load here instead!
+        // TODO: Look for for a plugins/onclick.js file to load here instead!
         // if template, then javascript.push_str(the contents of the template file).
+        // Hmm!
         // else {
-            
-        javascript.push_str(&link_element(&link_counter));
-        javascript.push_str(".addEventListener('click', function() {");
-        javascript.push_str(&link_element(&link_counter));
-        javascript.push_str(".classList.add('cf-clicked');");
-        javascript.push_str("document.getElementById(\"card_");
-        javascript.push_str(&link_item.target_card_element_id);
-        javascript.push_str("\").classList.add('cf-fade-in');});");
-        
 
+        // All plugins/onclick will be given two variables to work with:
+        // link_element
+        // target_card_element
+        javascript.push_str(&link_element(&link_counter));
+        javascript.push_str(".addEventListener('click', function() { let link_element = ");
+        javascript.push_str(&link_element(&link_counter));
+        javascript.push_str(";let target_card_element = document.getElementById(\"card_");
+        javascript.push_str(&link_item.target_card_element_id);
+        javascript.push_str("\");\n");
+            
+        //TODO: onclick.js exists? Load it and inject it.
+        if !onclick_plugin_contents.is_empty() {
+            javascript.push_str(&onclick_plugin_contents);
+            javascript.push_str("\n");
+        }
+
+        javascript.push_str("});"); // Close the function for addEventListener
+        
         // }
         link_counter+=1;
     }

@@ -28,12 +28,10 @@ pub fn do_build() -> Result<(), error::CampfireError> {
     throw_general_campfire_error(BONES_ERROR_MISSING_MAIN_FILE);
   }
 
-  let mut cardslist:Vec<Card> = Vec::<Card>::new();
-
   // First we create a Document based on campfire set vars and custom set vars in the 
   // campfire file. Then, we compile the cards. Finally (later in this file), we 
   // set the document's body_content based on the compiled content in the cards.
-  let mut document = match parser::parse_campfire_file_as_string(&main_file_name, &main_file_as_string.as_ref().unwrap(), &mut cardslist) {
+  let mut document = match parser::parse_campfire_file_as_string(&main_file_name, &main_file_as_string.as_ref().unwrap()) {
     Ok(doc) => { doc },
     Err(some_error) => {
       return Err(some_error)
@@ -53,7 +51,7 @@ pub fn do_build() -> Result<(), error::CampfireError> {
   };
   
   // Convert to markdown
-  for card in cardslist.iter_mut().enumerate() {
+  for card in document.cards_list.iter_mut().enumerate() {
     let (_i,val):(usize, &mut Card) = card;
     if !&val.name.is_empty() && !&val.raw_body.is_empty() { // If you don't check for this, you may get an error
                                        // while trying to .unwrap() a None (in the below param to markdown_to_html)
@@ -62,7 +60,7 @@ pub fn do_build() -> Result<(), error::CampfireError> {
     //println!("{}", &val.html_body);
   }
   
-  match compiler::compile_campfire_cards_into_document(&mut cardslist, &mut document) {
+  match compiler::compile_campfire_cards_into_document(&mut document) {
     Ok(()) => { println!("Parse {}... ✅", &main_file_name); },
     Err(some_error) => {
       campfire_error(some_error);

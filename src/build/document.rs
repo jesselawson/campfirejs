@@ -1,5 +1,7 @@
 // A document is a collection of cards
 
+use super::card::Card;
+
 pub struct LinkIndexItem {
     pub link_element_id: String,            // The element ID of the link span itself
     pub target_card_element_id: String      // The element ID of target card's div
@@ -13,6 +15,7 @@ pub struct Document {
     pub css_content: String,
     pub title: String,
     pub link_index: Vec<LinkIndexItem>,
+    pub cards_list: Vec<Card>,
     pub javascript: String
 }
 
@@ -35,12 +38,14 @@ impl Document {
                 </style>
             </head>
             <body>
+            <div class="campfire-card-container">
         "##);
     }
 
     pub fn use_default_footer(&mut self) {
         self.footer_content =  String::from(r##"
-                <script src="campfire.js"></script>
+            </div><!-- /campfire-card-container !-->
+            <script src="campfire.js"></script>
             </body>
         </html>
         "##);
@@ -54,24 +59,27 @@ impl Document {
         }   
 
         .campfire-card {
-            padding: .87em;
+            padding: 1.11em;
             border: 1px solid #333fff;
-            border-radius: 1px;
+            box-shadow: 1px 1px 3px rgba(0,0,0,.25);
             opacity: 0;
-            display: none;
+            visibility: hidden;
             transition: opacity .71s;
+            border-radius: 8px;
+            margin-bottom: 1.31em;
         }
 
         .campfire-card-label {
             text-color: blue;
             text-decoration: underline;
             transition: text-color .5s;
+            transition: height .5s;
             cursor: pointer;
         }
 
         .start-card {
             opacity: 1;
-            display: block;
+            visibility: visible;
         }
 
         .cf-clicked {
@@ -81,8 +89,13 @@ impl Document {
         }
 
         .cf-fade-in {
-            display: block;
+            visibility: visible;
             opacity: 1;
+        }
+
+        .cf-fade-out {
+            visibility: hidden;
+            opacity: 0;
         }
         "##);
     }

@@ -12,32 +12,39 @@ $begin start2
 
 ## Cards
 
+A card a combination of Markdown and Campfire expressions. 
 
+Let's look at a %{basic card}(basic_card) that does absolutely nothing.
 
+$end 
 
+$begin basic_card 
 
-Content is stored on %{cards}(how_fun), which are described like this:
+Here's a basic card:
 
-Super!
+```
+$begin my_card
+Hello, world!
+$end
+```
+
+Campfire cards start with the `$begin` %{command}(commands), which takes one argument: an 
+alphanumeric card identifier. This identifer is unique to the card and is used 
+when creating %{links}(links).
 
 $end
 
-$begin how_fun 
+$begin links 
 
-Isn't this neat? Let's look at some %{basic examples}(basic_examples).
+Links is above commands.
 
-```
-$ begin whocares
+$end 
 
-I am a Campfire file -- neat!
+$begin commands 
 
-$ end
-
-// Of course, this is only an example!
-```
+Commands are below links.
 
 $end
-
 
 $begin basic_examples 
 

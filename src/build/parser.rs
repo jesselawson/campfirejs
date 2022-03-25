@@ -92,7 +92,7 @@ fn set_css_and_check_for_custom_css(document:&mut Document) -> Result<bool, Camp
 
 /// Returns a Document that contains any config vars that were declared, as well 
 /// as the content of the header, body, and footer
-pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, cardslist:&mut Vec<Card>) -> Result<Document, CampfireError>{
+pub fn parse_campfire_file_as_string(filename: &String, file_string: &String) -> Result<Document, CampfireError>{
     
     let file = CardParser::parse(Rule::campfire_file, file_string.as_str())
         .expect("unsuccessful parse")
@@ -114,6 +114,8 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
         footer_content: String::new(),
         css_content: String::new(),
         title: String::new(),
+        
+        cards_list: Vec::<Card>::new(),
 
         // When a new Campfire link is found, they're stored here for the javascript generator
         link_index: Vec::<LinkIndexItem>::new(),
@@ -178,7 +180,7 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String, ca
                     }
                     
                 }
-                cardslist.push(card.clone());
+                document.cards_list.push(card);
             },
             Rule::EOI => { 
                 break; // This prevents a duplicated last card in the file
