@@ -162,7 +162,7 @@ pub fn compile_campfire_cards_into_document(document:&mut Document) -> Result<()
 
                     println!("-> {}", &link_tag_scratch);
 
-                    let name:String = String::from(&val.name);
+                    let name:String = String::from(&target_scratch);
                     
                     // Store the link details for the javascript generator
                     document.link_index.push(LinkIndexItem {
@@ -305,15 +305,19 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
         // All plugins/onclick will be given two variables to work with:
         // link_element
         // target_card_element
+        //javascript.push_str(&link_element(&link_counter));
+        
+        javascript.push_str("document.body.addEventListener('click', function(event) { if( event.target.id == '");
+        javascript.push_str(&link_item.link_element_id);
+        javascript.push_str("') { let link_element = () => { return ");
         javascript.push_str(&link_element(&link_counter));
-        javascript.push_str(".addEventListener('click', function() { let link_element = ");
-        javascript.push_str(&link_element(&link_counter));
-        javascript.push_str(";let target_card_element = document.getElementById(\"card_");
+        javascript.push_str("; };");
+        javascript.push_str(";let target_card_element = () => { return document.getElementById(\"card_");
         javascript.push_str(&link_item.target_card_element_id);
-        javascript.push_str("\");let target_card_html_content = ");
-        javascript.push_str("campfire_cards.get(\"");
+        javascript.push_str("\");}; let target_card_html_content = () => {");
+        javascript.push_str("return campfire_cards.get(\"");
         javascript.push_str(&link_item.target_card_name);
-        javascript.push_str("\");let campfire_card_container = document.getElementById('campfire-card-container');\n");
+        javascript.push_str("\");}; let campfire_card_container = () => {return document.getElementById('campfire-card-container');};\n");
 
         // TODO: add let target_card_contents = "card.compiled_body" as html to add to innerHTML
         //  that way we can add it to the container in the plugin file. 
@@ -324,7 +328,7 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
             javascript.push_str("\n");
         }
 
-        javascript.push_str("});"); // Close the function for addEventListener
+        javascript.push_str("}});"); // Close the function for addEventListener
         
         // }
         link_counter+=1;
