@@ -182,6 +182,46 @@ it will use the contents of each for their respective areas.
 | -------------------- |
 ```
 
+# Plugin support
+
+To start making plugins, create a `plugins` directory at the root of your project.
+
+## Link click plugin
+
+You can write your own Javascript to handle the `click` event that is fired off when 
+a Campfire link is clicked. 
+
+Campfire will look for a file named `plugins/onclick.js`. If found, it will 
+replace its default click even behavior with whatever is found in the plugin file. 
+
+If you leave the file blank, links just wont work; you'll need to at least 
+implement some sort of way to show the linked-to card. To help, Campfire provides 
+a few functions:
+
+| Function | Description | 
+| --------------------------- | ------ |
+| `link_element()` | Returns the HTML element of the link that was clicked via `getElementById()` |
+| `campfire_card_container()` | Returns the HTML element of the div container where cards are appended as links to them are clicked |
+| `target_card_element()` | Returns the HTML element of the target card's root via `getElementById()` |
+| `target_card_html_content()` | Returns a string of valid HTML that can be inserted somewhere with `insertAdjacentHTML()` |
+
+The default behavior of every link's click event is as follows:
+
+```javascript
+link_element().classList.add('cf-clicked');
+campfire_card_container().insertAdjacentHTML('beforeend', target_card_html_content());
+// Fades in the card; if you don't delay this a bit, the fade effect wont be visible.
+window.setTimeout(function() {
+    target_card_element().classList.add('cf-fade-in');
+},50);
+```
+
+When writing your own `onclick.js` plugin, be sure to account for at least two 
+things:
+- Change the link to indicate that it was clicked
+- Show the user the contents of the next card in a way that allows any links in 
+  that card to then reveal any linked-to cards
+
 # Contributing 
 
 TODO

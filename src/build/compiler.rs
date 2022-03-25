@@ -326,6 +326,15 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
         if !onclick_plugin_contents.is_empty() {
             javascript.push_str(&onclick_plugin_contents);
             javascript.push_str("\n");
+        } else {
+            javascript.push_str(r##"
+link_element().classList.add('cf-clicked');
+campfire_card_container().insertAdjacentHTML('beforeend', target_card_html_content());
+// Fades in the card; if you don't delay this a bit, the fade effect wont be visible.
+window.setTimeout(function() {
+    target_card_element().classList.add('cf-fade-in');
+},50);      
+            "##);
         }
 
         javascript.push_str("}});"); // Close the function for addEventListener
