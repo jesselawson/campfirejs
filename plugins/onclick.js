@@ -4,3 +4,9 @@ campfire_card_container().insertAdjacentHTML('beforeend', target_card_html_conte
 window.setTimeout(function() {
     target_card_element().classList.add('cf-fade-in');
 },50);
+
+campfire_cards.forEach( function(card) {
+    // TODO: Can we clear out any cf-fade-in cards before fading in the next one? 
+    // How would we REMOVE the dom content? 
+    // Is that even necessary? Maybe someone else can do it
+});

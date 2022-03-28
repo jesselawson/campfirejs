@@ -17,7 +17,6 @@ A card a combination of Markdown and Campfire expressions.
 Let's look at a %{basic card}(basic_card) that does absolutely nothing.
 
 $end 
-
 $begin basic_card 
 
 Here's a basic card:
@@ -29,20 +28,44 @@ $end
 ```
 
 Campfire cards start with the `$begin` %{command}(commands), which takes one argument: an 
-alphanumeric card identifier. This identifer is unique to the card and is used 
-when creating %{links}(links).
+alphanumeric card identifier. This identifer is unique to the card, and is the same 
+identifier used when creating %{Campfire links}(links).
+
 
 $end
-
 $begin links 
 
-Links is above commands.
+Campfire links render a new card. 
+
+For example, if I had the following card:
+
+```
+$ begin some_card
+
+Lorem ipsum
+
+$ end
+```
+
+I could create a Campfire link and render that card in a different card 
+like this: 
+
+```
+A % {link}(some_card) to the card.
+```
 
 $end 
 
 $begin commands 
 
-Commands are below links.
+Commands always start with $, and will generally have the following format: 
+
+```
+$<command> <param> [=] [<value>]
+```
+
+For example, each card starts with the $ begin command and ends with the $ end
+command. 
 
 $end
 

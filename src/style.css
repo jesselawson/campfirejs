@@ -1,4 +1,4 @@
-.campfire-card-container {
+/*.campfire-card-container {
     width: 600px;
     margin: auto;
 }   
@@ -15,7 +15,7 @@
     text-color: blue;
     text-decoration: underline;
     transition: text-color .5s;
-}
+}*/
 
 .cf-clicked {
    text-color: inherit;

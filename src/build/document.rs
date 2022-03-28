@@ -31,12 +31,15 @@ impl Document {
                 <title>"##);
         self.header_content.push_str(&self.title);
         self.header_content.push_str(r##"</title>
-                <style>"##);
+                
+        <style>"##);
         self.header_content.push_str(&self.css_content);
         self.use_default_css();
         self.header_content.push_str(r##"
         
                 </style>
+
+                <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.classless.min.css">
             </head>
             <body>
             <div id="campfire-card-container">
@@ -54,20 +57,25 @@ impl Document {
 
     pub fn use_default_css(&mut self) {
         self.header_content.push_str(r##"
-        #campfire-card-container {
+        /*#campfire-card-container {
             width: 600px;
             margin: auto;
         }   
 
-        .campfire-card {
-            padding: 1.11em;
+        .__oldcampfirecard {
             border: 1px solid #333fff;
             box-shadow: 1px 1px 3px rgba(0,0,0,.25);
-            opacity: 0;
+            margin-bottom: 1.31em;
+            padding: 1.11em;
+        }*/
+
+        .campfire-card {
+            
             visibility: hidden;
             transition: opacity .71s;
             border-radius: 8px;
-            margin-bottom: 1.31em;
+            
+            opacity: 0;
         }
 
         .campfire-card-label {

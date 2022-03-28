@@ -331,3 +331,10 @@ return campfire_error(CampfireError::InvalidFile, &filename);
   (Perhaps this should be configurable? I can forsee interesting reasons for wanting to be 
   able to render the same card many times (for example, when teaching a concept -- instead of 
   scrolling back up, just render the content again?))
+
+- [Enhancement] `plugins/onclick.js` should really be `plugins/link_click.js` because
+  what if we wanted to rope in a different onclick event somewhere?
+
+
+- [Enhancement] `campfire build --html_pages` outputs the project in zero javascript --
+  all html files linked to one another and the start card as index.html
