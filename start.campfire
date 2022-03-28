@@ -4,7 +4,8 @@ $begin start
 
 # Campfire is an interaction system built on top of Markdown.
 
-Organize your content in **cards**, then link to different cards with %{hyperlinks}(start2).
+Organize your content in **cards**, then link to different cards with 
+special %{hyperlinks}(start2).
 
 $end
 
@@ -14,12 +15,10 @@ $begin start2
 
 A card a combination of Markdown and Campfire expressions. 
 
-Let's look at a %{basic card}(basic_card) that does absolutely nothing.
+Let's look at a %{basic card}(basic_card) that does absolutely nothing:
 
 $end 
 $begin basic_card 
-
-Here's a basic card:
 
 ```
 $begin my_card
@@ -27,7 +26,7 @@ Hello, world!
 $end
 ```
 
-Campfire cards start with the `$begin` %{command}(commands), which takes one argument: an 
+All Campfire cards start with the `$begin` %{command}(commands), which takes one argument: an 
 alphanumeric card identifier. This identifer is unique to the card, and is the same 
 identifier used when creating %{Campfire links}(links).
 

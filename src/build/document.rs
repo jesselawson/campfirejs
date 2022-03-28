@@ -39,7 +39,6 @@ impl Document {
         
                 </style>
 
-                <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.classless.min.css">
             </head>
             <body>
             <div id="campfire-card-container">

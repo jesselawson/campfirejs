@@ -1,6 +1,7 @@
 # Campfire
 
-Campfire is an engine for telling stories. 
+Campfire makes it possible to render blocks of Markdown as HTML and then link 
+to other blocks in a system of "cards," which are like pages. 
 
 It takes a folder of at least one Campfire file and converts it into a website that you can share or distribute, 
 host online, or keep on your desktop.
@@ -104,71 +105,39 @@ Extendable via plugins, with many built-in plugins.
 
 ## Hyperlinks
 
-Cards can link to other cards in two ways: **reveal links**, and **replace links**. 
 
-A reveal link will reveal another card immediately below the currently active card (the one
-from which the link was clicked).
-
-A replace link will replace all the cards on the page with a new card. Starting fresh, 
-in a way.
-
-## Event hooks
-
-All Campfire expressions will emit an event to the window that can be captured 
-with `window.addEventListener(theEventName, someFunction)`. 
-
-The most basic event is a `click` event, which occurs when a user clicks 
-a link rendered by a Campfire expression. You can listen for click events or 
-any derivative event from a click:
-
-| Activity                      | Hook emitted | 
-| ----------------------------- | ---------------------- | 
-| Mouse click                   | `next_card1_click_event`       |
-| Mouse over                    | `next_card1_mouse_hover_event` |
-| Mouse down                    | `next_card1_mouse_down_event` |
-| Mouse up                      | `next_card1_mouse_up_event`   | 
 
 
 # Architecture
 ## Parsing
 
 The parser reads the *.campfire file in two stages:
-- First, it organizes the file into cards and both campfire & custom set commands.
-- Second, it organizes cards into markdown and campfire content.
+- First, it organizes the file into cards and $set commands.
+- Second, it organizes cards into markdown and campfire expressions.
 
 ## Compiling
 
 The compiler is responsible for compiling the markdown and campfire expressions.
-They're stored in the document's card vector's compiled_body.
+They're stored in the compiled_body of each card that's part of the document's 
+cards_list.
 
 ## Generating Javascript
 
-For every link, we generate a new HTML div element and set the innerHTML to be 
-the content's of the linked card's compiled_body. This means that any card that 
-does not have a link to it will not be rendered. 
-
-### Global variables
-
-Campfire creates a set of empty functions that can be overridden to provide 
-custom functionality based on event listeners attached to each link. 
-
-Using the example link `%{Let's go!}(next_card)`, the following 
-event functions can be overridden: 
-
-| Event type    | Global function 
-| ------------- | ---------------------
-| `mouseenter`  | `window.Campfire.next_card_mouseenter`
-| `mousedown`   | `window.Campfire.next_card_mousedown`
-| `mouseup`     | `window.Campfire.next_card_mouseup`
-| `mouseleave`  | `window.Campfire.next_card_mouseleave`
-| `click`       | `window.Campfire.next_card_click`
+Cards are prepared for dynamic insertion and left to the `onclick.js` plugin 
+to handle when, where, and how the card content is rendered. 
 
 ## Building the project
 
 The default behavior is to compile a Campfire project into single, valid webpage (`index.html`). 
 
+At the root of the project, run: `campfire build`
+
+# Headers and Footers
+
 If Campfire detects a `header.html` or `footer.html` file in the working directory, 
 it will use the contents of each for their respective areas.
+
+Here is an example of locations in the main file, `index.html`:
 
 ```
 | -------------------- |
@@ -182,11 +151,16 @@ it will use the contents of each for their respective areas.
 | -------------------- |
 ```
 
+# CSS Support
+
+If a `style.css` file is found at the root of the project, the contents of that 
+file will be loaded into a `<style>` block in the head of `index.html`. 
+
 # Plugin support
 
 To start making plugins, create a `plugins` directory at the root of your project.
 
-## Link click plugin
+## Link click plugin {#onclick-plugin}
 
 You can write your own Javascript to handle the `click` event that is fired off when 
 a Campfire link is clicked. 
@@ -224,13 +198,6 @@ things:
 
 # Contributing 
 
-TODO
-
-The bones compiler works by parsing `main.bn`, then parsing each other `*.bn` file 
-that it counters by walking through files as they are linked. It is organized 
-by command -- e.g., `build.rs` in the project's root handles the `bones build` command, 
-`publish.rs` handles the `bones publish` command, etc. 
-
 # Roadmap
 
 TODO
@@ -247,7 +214,8 @@ TODO
 Campfiresphere(?)
 
 What if you could register a link online and anytime someone linked to it, it would 
-display YOUR card? 
+display YOUR card? (This would never work because someone would just change their 
+card to something mean or gross -- this is a moderation nightmare).
 
 e.g.:
 
@@ -338,3 +306,36 @@ return campfire_error(CampfireError::InvalidFile, &filename);
 
 - [Enhancement] `campfire build --html_pages` outputs the project in zero javascript --
   all html files linked to one another and the start card as index.html
+
+- [Enhancement?] Being able to hook into different events
+
+Campfire creates a set of empty functions that can be overridden to provide 
+custom functionality based on event listeners attached to each link. 
+
+Using the example link `%{Let's go!}(next_card)`, the following 
+event functions can be overridden: 
+
+| Event type    | Global function 
+| ------------- | ---------------------
+| `mouseenter`  | `window.Campfire.next_card_mouseenter`
+| `mousedown`   | `window.Campfire.next_card_mousedown`
+| `mouseup`     | `window.Campfire.next_card_mouseup`
+| `mouseleave`  | `window.Campfire.next_card_mouseleave`
+| `click`       | `window.Campfire.next_card_click`
+
+Or maybe these could be "Event Hooks":
+
+All Campfire expressions will emit an event to the window that can be captured 
+with `window.addEventListener(theEventName, someFunction)`. 
+
+The most basic event is a `click` event, which occurs when a user clicks 
+a link rendered by a Campfire expression. You can listen for click events or 
+any derivative event from a click:
+
+| Activity                      | Hook emitted | 
+| ----------------------------- | ---------------------- | 
+| Mouse click                   | `next_card1_click_event`       |
+| Mouse over                    | `next_card1_mouse_hover_event` |
+| Mouse down                    | `next_card1_mouse_down_event` |
+| Mouse up                      | `next_card1_mouse_up_event`   | 
+
