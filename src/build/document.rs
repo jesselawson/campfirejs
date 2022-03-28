@@ -17,7 +17,8 @@ pub struct Document {
     pub title: String,
     pub link_index: Vec<LinkIndexItem>,
     pub cards_list: Vec<Card>,
-    pub javascript: String
+    pub javascript: String,
+    pub card_html_tag: String, // the html tag used when creating <element> campfire-card
 }
 
 impl Document {

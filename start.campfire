@@ -1,4 +1,5 @@
 $set @title = Welcome to Campfire
+$set @card_html_tag = article
 
 $begin start
 

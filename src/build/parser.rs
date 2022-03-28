@@ -121,7 +121,9 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String) ->
         link_index: Vec::<LinkIndexItem>::new(),
 
         // The generated javascript
-        javascript: String::new()
+        javascript: String::new(),
+
+        card_html_tag: String::from("div")
     };
 
     for line in file.into_inner() {
@@ -139,13 +141,26 @@ pub fn parse_campfire_file_as_string(filename: &String, file_string: &String) ->
         match line.as_rule() {
             // Predefined commands
             Rule::set_title_command => {
-
                 let inner_pairs = line.into_inner();
                 for pair in inner_pairs {
                     match pair.as_rule() {
                         // TODO -- continue getting $set details, and populate Document.
                         Rule::command_value => {
                             document.title = pair.as_str().to_string();
+                        },
+                        _ => {
+                            return Err(CampfireError::MalformedCampfireSetCommand);
+                        }
+                    }
+                }
+            },
+            Rule::set_card_html_tag_command => {
+                let inner_pairs = line.into_inner();
+                for pair in inner_pairs {
+                    match pair.as_rule() {
+                        // TODO -- continue getting $set details, and populate Document.
+                        Rule::command_value => {
+                            document.card_html_tag = pair.as_str().to_string();
                         },
                         _ => {
                             return Err(CampfireError::MalformedCampfireSetCommand);

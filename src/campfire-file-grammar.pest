@@ -18,10 +18,12 @@ set_keyword = _{ "$set" }
 custom_set_command = { set_keyword ~ SPACE_SEPARATOR* ~ command_target ~ SPACE_SEPARATOR* ~ "=" ~ SPACE_SEPARATOR* ~command_value }
 campfire_set_command = { set_keyword ~ SPACE_SEPARATOR* ~ "@" ~ command_target ~ SPACE_SEPARATOR* ~ "=" ~ SPACE_SEPARATOR* ~ command_value }
 set_title_command = { set_keyword ~ SPACE_SEPARATOR* ~ "@title" ~ SPACE_SEPARATOR* ~ "=" ~ SPACE_SEPARATOR* ~ command_value }
+set_card_html_tag_command = { set_keyword ~ SPACE_SEPARATOR* ~ "@card_html_tag" ~ SPACE_SEPARATOR* ~ "=" ~ SPACE_SEPARATOR* ~ command_value }
 all_possible_set_commands = _{
 	custom_set_command | 
     //campfire_set_command |
-    set_title_command
+    set_title_command |
+    set_card_html_tag_command
 }
 card_start = _{ begin_keyword ~ SPACE_SEPARATOR* ~ card_name ~ SPACE_SEPARATOR* ~ "\n"? }
 card_body = {  (!"$end" ~ !"```" ~ !SPACE_SEPARATOR ~ ANY)* } 

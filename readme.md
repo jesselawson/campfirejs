@@ -105,7 +105,15 @@ Extendable via plugins, with many built-in plugins.
 
 ## Hyperlinks
 
+TODO
 
+## Set commands
+
+Campfire set commands are used to configure Campfire. 
+
+- `$set @title = <string>` Sets the window title of `index.html` (e.g., `$set @title = My Campfire`)
+- `$set @card_html_tag = <string>` Sets the element used for new cards (e.g., `$set @card_html_tag = <div>`). This 
+  is the element that has class `campfire-card`.
 
 
 # Architecture

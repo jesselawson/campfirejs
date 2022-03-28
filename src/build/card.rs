@@ -34,7 +34,6 @@ impl Card {
     self.compiled_body = html_content;
   }
 
-
 }
 
 

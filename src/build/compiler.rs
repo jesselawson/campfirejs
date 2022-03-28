@@ -66,10 +66,14 @@ pub fn compile_campfire_cards_into_document(document:&mut Document) -> Result<()
 
   // Populate compiled_body of each card
   for card in document.cards_list.iter_mut().enumerate() {
+    
     let mut scratch = String::from("");
     let(_i,val):(usize, &mut Card) = card;
     
-    scratch.push_str("<div class=\"campfire-card");
+    scratch.push_str("<");
+    // Determine element we should use for the Campfire card
+    scratch.push_str(&document.card_html_tag);
+    scratch.push_str(" class=\"campfire-card");
     if val.name.eq("start") {
         scratch.push_str(" start-card");
     }
