@@ -1,13 +1,87 @@
-This card starts with markdown, <c [[contains a link]] -> next_card c>, and has two paragraphs.
+$set @title = Welcome to Campfire
+$set @card_html_tag = article
 
-Here's the **second** paragraph. 
+$begin start
 
-<c [[This whole paragraph is a campfire expression]] -> last_card c>.
+# Campfire is an interaction system built on top of Markdown.
 
-And here's a paragraph with _just_ markdown.
+Organize your content in **cards**, then link to different cards with 
+special %{hyperlinks}(start2).
 
-This is a card body. We can expect **markdown** in 
-a _variety of forms_, and also some Campfire expressions.
+$end
 
-A Campfire expression will be rendered just like a normal 
-link -- <c like this! -> next_card c>
+$begin start2
+
+## Cards
+
+A card a combination of Markdown and Campfire expressions. 
+
+Let's look at a %{basic card}(basic_card) that does absolutely nothing:
+
+$end 
+$begin basic_card 
+
+```
+$begin my_card
+Hello, world!
+$end
+```
+
+All Campfire cards start with the `$begin` %{command}(commands), which takes one argument: an 
+alphanumeric card identifier. This identifer is unique to the card, and is the same 
+identifier used when creating %{Campfire links}(links).
+
+
+$end
+$begin links 
+
+Campfire links render a new card. 
+
+For example, if I had the following card:
+
+```
+$ begin some_card
+
+Lorem ipsum
+
+$ end
+```
+
+I could create a Campfire link and render that card in a different card 
+like this: 
+
+```
+A % {link}(some_card) to the card.
+```
+
+$end 
+
+$begin commands 
+
+Commands always start with $, and will generally have the following format: 
+
+```
+$<command> <param> [=] [<value>]
+```
+
+For example, each card starts with the $ begin command and ends with the $ end
+command. 
+
+$end
+
+$begin basic_examples 
+
+Card content is written in Campfire, which is basically just Markdown with some 
+fancy custom tags that do things.
+
+So **most** normal Markdown syntax will just _work_; you can always see the 
+[language cheatsheet](https://campfirejs.org/cheatsheet).
+
+$end
+
+$begin neato_burrito
+
+Ha! This is a silly card. 
+
+$end
+

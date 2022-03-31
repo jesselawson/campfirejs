@@ -1,87 +1,25 @@
-$set @title = Welcome to Campfire
+$set @title = Campfire Demo
 $set @card_html_tag = article
 
 $begin start
 
-# Campfire is an interaction system built on top of Markdown.
-
-Organize your content in **cards**, then link to different cards with 
-special %{hyperlinks}(start2).
+If I link to the %{gray}(gray) card, then the %{gray}(gray) card again... 
 
 $end
 
-$begin start2
+$begin black
 
-## Cards
-
-A card a combination of Markdown and Campfire expressions. 
-
-Let's look at a %{basic card}(basic_card) that does absolutely nothing:
+Great! Now select your favorite **number**:
 
 $end 
-$begin basic_card 
+$begin gray
 
-```
-$begin my_card
-Hello, world!
-$end
-```
-
-All Campfire cards start with the `$begin` %{command}(commands), which takes one argument: an 
-alphanumeric card identifier. This identifer is unique to the card, and is the same 
-identifier used when creating %{Campfire links}(links).
-
-
-$end
-$begin links 
-
-Campfire links render a new card. 
-
-For example, if I had the following card:
-
-```
-$ begin some_card
-
-Lorem ipsum
-
-$ end
-```
-
-I could create a Campfire link and render that card in a different card 
-like this: 
-
-```
-A % {link}(some_card) to the card.
-```
-
-$end 
-
-$begin commands 
-
-Commands always start with $, and will generally have the following format: 
-
-```
-$<command> <param> [=] [<value>]
-```
-
-For example, each card starts with the $ begin command and ends with the $ end
-command. 
+ What happens if I %{link to myself}(gray)?
 
 $end
 
-$begin basic_examples 
+$begin dark_gray
 
-Card content is written in Campfire, which is basically just Markdown with some 
-fancy custom tags that do things.
-
-So **most** normal Markdown syntax will just _work_; you can always see the 
-[language cheatsheet](https://campfirejs.org/cheatsheet).
+asdf
 
 $end
-
-$begin neato_burrito
-
-Ha! This is a silly card. 
-
-$end
-

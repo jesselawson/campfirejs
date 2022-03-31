@@ -102,6 +102,7 @@ pub fn compile_campfire_cards_into_document(document:&mut Document) -> Result<()
                     scratch.push_str(expr.as_str());
                 },
                 
+                // A %{campfire link}(some_card) was found
                 Rule::campfire_link => {
                     //println!("-> Got campfire tag expression");
 
@@ -334,10 +335,14 @@ pub fn generate_javascript_for_document(document:&mut Document) -> Result<(), Ca
             javascript.push_str(r##"
 link_element().classList.add('cf-clicked');
 campfire_card_container().insertAdjacentHTML('beforeend', target_card_html_content());
+
 // Fades in the card; if you don't delay this a bit, the fade effect wont be visible.
 window.setTimeout(function() {
-    target_card_element().classList.add('cf-fade-in');
-},50);      
+    // Fade in the last child element of the container -- which will be the 
+    // newly added card
+    console.log(campfire_card_container().lastChildElement);
+    campfire_card_container().lastChildElement.classList.add('cf-fade-in');
+},100);      
             "##);
         }
 

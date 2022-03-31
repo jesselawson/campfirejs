@@ -1,16 +1,26 @@
 # Campfire
 
-Campfire makes it possible to render blocks of Markdown as HTML and then link 
-to other blocks in a system of "cards," which are like pages. 
+This project is a proof-of-concept compiler for the `.campfire` language.
 
-It takes a folder of at least one Campfire file and converts it into a website that you can share or distribute, 
-host online, or keep on your desktop.
+The Campfire language is basically GitHub-flavored Markdown organized 
+into cards that can be linked to and from one another. Every time you click 
+a link to a specific card, a new instance of that card is revealed on the screen. 
+
+Campfire was originally designed to build digital textbooks for 
+competency-based courses, but you're not limited to only educational content. 
+It naturally encourages exploration, and is aimed at providing a means of 
+creating anything from multi-faceted and mutable narratives to structured .
+
+
 
 Use cases include, but are not limited to:
-* Interactive educational content, especially for competency-based 
-  learning
+* Interactive educational content, especially for competency-based learning 
 * Interactive fiction (e.g., CYOA and other mutable narrative IF)
 * Topic exploration and presentation
+
+
+**Currently in working alpha.** Things are subject to change, and that's okay. 
+
 
 ## Features
 
@@ -347,3 +357,8 @@ any derivative event from a click:
 | Mouse down                    | `next_card1_mouse_down_event` |
 | Mouse up                      | `next_card1_mouse_up_event`   | 
 
+- [Feature; don't be so hard on yourself] (cloned_elements_inserts) What 
+happens when you link to a card that was already linked to? Shouldn't that card come again?
+
+  -- Clone the element so that we can create as many of the cards as there are 
+  links to it.
