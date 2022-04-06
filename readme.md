@@ -81,7 +81,7 @@ my-project/$ campfire build
 
 # Writing in Campfire
 
-## Cards {#cards}
+## Cards
 
 Campfire content is organized in **cards**, which always start with the **begin tag** (`$begin <cardname>`)
 on a new line and always end with **end tag** (`$end`) on a new line.
@@ -89,7 +89,7 @@ on a new line and always end with **end tag** (`$end`) on a new line.
 When you declare a new card with `$begin`, everything below it is considered
 part of that card, up to either the end of the file or an end tag.
 
-## Campfire expressions {#expressions}
+## Campfire expressions
 
 Content between the begin and end tags can be any combination of GitHub-flavored 
 markdown and **campfire expressions**. 
@@ -120,7 +120,7 @@ reveal the `go_to_cabin` card when clicked.
   label  target card
 ```
 
-## Campfire files {#files}
+## Campfire files
 
 Every campfire project starts with at least one file called `start.campfire`, 
 and the first card is always named "start":
@@ -135,7 +135,7 @@ $begin start
 Think of `$begin start` as the `main` entrypoint into your Campfire experience.
 
 Currently, Campfire only supports having one file named `start.campfire`.
-## Set commands {#set-commands}
+## Set commands
 
 Campfire set commands are used to configure Campfire. 
 
@@ -145,28 +145,27 @@ Campfire set commands are used to configure Campfire.
 
 
 # Architecture
-## Parsing
 
-The parser reads the *.campfire file in two stages:
+Campfire's `do_build()` function kicks off the main compilation cycle, which has 
+four steps: parsing, compiling, generating, and building. 
+
+In the Parsing step, the parser reads the `start.campfire` file in two stages:
 - First, it organizes the file into cards and $set commands.
 - Second, it organizes cards into markdown and campfire expressions.
 
-## Compiling
+In the Compiling step, the compiler is responsible for compiling the markdown and campfire expressions.
+They're stored in the `compiled_body` of each card that's part of the document's 
+`cards_list`.
 
-The compiler is responsible for compiling the markdown and campfire expressions.
-They're stored in the compiled_body of each card that's part of the document's 
-cards_list.
+In the Generating step, cards are prepared for dynamic insertion by creating 
+HTML elements for them, and left to the `onclick.js` plugin to handle when, 
+where, and how the card content is rendered. 
 
-## Generating Javascript
+The Building step is where the files are written. The goal default behavior is to 
+compile a Campfire project into single, valid webpage (`index.html`). For now, 
+there is an index.html, campfire.js, and optional style.css.
 
-Cards are prepared for dynamic insertion and left to the `onclick.js` plugin 
-to handle when, where, and how the card content is rendered. 
-
-## Building the project
-
-The default behavior is to compile a Campfire project into single, valid webpage (`index.html`). 
-
-At the root of the project, run: `campfire build`
+To build a project, go to the root of your project and run: `campfire build`
 
 # Headers and Footers
 
@@ -234,12 +233,7 @@ things:
 
 # Contributing 
 
-# Roadmap
-
-TODO
-
-* Uses Turbo (formerly turbolinks)
-
+Feel free to clone, tinker, then open a pull request. 
 
 # Ideas
 
