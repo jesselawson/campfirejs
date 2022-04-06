@@ -1,78 +1,110 @@
 # Campfire
 
-This project is a proof-of-concept compiler for the `.campfire` language.
+This project is a proof-of-concept compiler for the Campfire language. It 
+takes a `.campfire` file and compiles it to a static website (`index.html`, 
+`campfire.js`, and an optional `style.css`).
 
 The Campfire language is basically GitHub-flavored Markdown organized 
 into cards that can be linked to and from one another. Every time you click 
-a link to a specific card, a new instance of that card is revealed on the screen. 
+a link to a specific card, a new instance of that card is revealed on the screen.
 
-Campfire was originally designed to build digital textbooks for 
-competency-based courses, but you're not limited to only educational content. 
-It naturally encourages exploration, and is aimed at providing a means of 
-creating anything from multi-faceted and mutable narratives to structured .
-
-
+Campfire was originally designed to build competency-based digital textbooks, 
+but you're not limited to only educational content. It naturally encourages 
+exploration and is useful for both mutable and immutable narratives. 
 
 Use cases include, but are not limited to:
 * Interactive educational content, especially for competency-based learning 
 * Interactive fiction (e.g., CYOA and other mutable narrative IF)
 * Topic exploration and presentation
 
-
 **Currently in working alpha.** Things are subject to change, and that's okay. 
+## Current features (and limitations)
 
+**Marketing fluff**
 
-## Features
+* Define your cards in one file (`start.campfire`)
+* Write in Markdown (uses a custom Markdown-compatable syntax)
+* Lightning-fast compilation to a static site
 
-* Creates HTML+CSS static site
-* Implements [CommonMark v0.30.0]()
-* Auto-publish to Github Pages
-* Uses `pest` for PEG parsing
+**Reality**
 
-# TODO
+* Single `start.campfire` source file only (future goal: parses all `.campfire` files present in directory)
+* Compiles to a static site (index.html, campfire.js, optional style.css) (future goal: compile to single html file)
+* Markdown compatible (future goal: fix inline code snippets not rendering properly, and fix command tags executing in code fences)
+* Uses `pest` to interpret Campfire
+## Next Milestone 
 
-- One parser to read in the campfire file, another parser to parse the card_body
-  into Markdown and campfire expressions.
+The next milestone is the `publish` command, to auto-publish to Github Pages. 
+
+I understand this presumes that people will be hosting these on GitHub Pages, but 
+think of this as a sensible default rather than a restriction.
 
 # Quickstart
 
-TODO
+**As a user**
 
-# Writing in Campfire
+1. Download the latest release, and extract the `campfire` executable to a directory 
+in your path. 
 
-Campfire structures its content in Cards -- which can contain markdown and campfire expressions.
+2. Create a project directory and then, inside, a file named `start.campfire`. 
 
-## Cards
+```bash
+$ mkdir my-project && cd my-project
+my-project/$ touch start.campfire
+```
 
-A card is a collection of content the same way a webpage is a collection of content.
-
-Cards are initialized with `$begin`, which takes the name of the cardk. 
-This is how you can refer back to it. 
-
-Every campfire project starts with at least one file called `start.campfire`, 
-and the first cardk is always called "start":
+3. Copy and paste the following into `start.campfire`:
 
 ```campfire
-// start.campfire
+$set @title = Hello, World!
 
 $begin start
 
+Hello, world! It's nice to %{meet you}(last).
+
+$end
+$begin last
+
+How fun!
+
+$end
 ```
 
-Think of `$begin start` as the `main` entrypoint into your program.
+4. Compile your project, which creates a `project` folder.
 
-When you declare a new cardk with `$begin`, everything below it is considered
-part of that cardk, up to either the end of the file or another `$begin` statement.
+```bash
+my-project/$ campfire build
 
-## Language design
+```
 
-A card is composed of one or more Campfire expressions.
+5. Open the `index.html` file that is inside the `project` folder. 
 
-A campfire expression is any combination of Markdown and Campfire snippets.
+# Writing in Campfire
 
-For the **Alpha** version of Campfire, there is only one snippet available: the **link**.
+## Cards {#cards}
 
-A link behaves like an `a` tag, but instead of going to a new page, it reveals 
+Campfire content is organized in **cards**, which always start with the **begin tag** (`$begin <cardname>`)
+on a new line and always end with **end tag** (`$end`) on a new line.
+
+When you declare a new card with `$begin`, everything below it is considered
+part of that card, up to either the end of the file or an end tag.
+
+## Campfire expressions {#expressions}
+
+Content between the begin and end tags can be any combination of GitHub-flavored 
+markdown and **campfire expressions**. 
+
+Currently, only one Campfire expression has been implemented: the **card link**. 
+A card link creates a link to another card and has the following syntax: 
+
+`%{link text}(target_card)`
+
+For example, if I wanted to have the word "button" link to the card named 
+`next_card`, I would write the following: 
+
+`%{button}(next_card)`
+
+A link behaves like an `<a>` tag, but instead of going to a new page, it reveals 
 the target card.
 
 ```campfire
@@ -83,41 +115,27 @@ In the above example, the word `cabin` is rendered as a Campfire link that will
 reveal the `go_to_cabin` card when clicked. 
 
 ```
-    label        target card
 %{cabin}(go_to_cabin)
+    |         |
+  label  target card
 ```
 
-The roadmap is exploring **plugins** for the beta version.
+## Campfire files {#files}
 
-`%{cabin}(go_to_cabin)[some_plugin]`
-
-Each plugin is a function that is automatically injected with a data structure 
-to help you customize Campfire: 
+Every campfire project starts with at least one file called `start.campfire`, 
+and the first card is always named "start":
 
 ```campfire
-Take me to your %{leader}(go_to_leader)[toggleOnClick;randomBackground]
+// start.campfire
+
+$begin start
+
 ```
 
-```typescript
-function toggleOnClick() {
-  window.campfire.getDocument(); // returns an array of all cards
-  window.campfire.getCurrentCard(); // returns the most recently called card as DIV Element
-  window.campfire.getCard(name); // Returns card by name as DIV Element
-  window.campfire.thisLink(); // Returns this link's id as SPAN Element
-}
-```
+Think of `$begin start` as the `main` entrypoint into your Campfire experience.
 
-label: The HTML that gets rendered as the link
-target card: The card the link should action us to
-plugins: semicolon-separated list of plugins.
-
-Extendable via plugins, with many built-in plugins.
-
-## Hyperlinks
-
-TODO
-
-## Set commands
+Currently, Campfire only supports having one file named `start.campfire`.
+## Set commands {#set-commands}
 
 Campfire set commands are used to configure Campfire. 
 
@@ -228,48 +246,14 @@ TODO
 - Group links together so that when one is clicked, the rest are no longer available. 
   This is a game feature; is this necessary? (could this be achieved with a plugin-esque add-on?)
 
-
-Campfiresphere(?)
-
-What if you could register a link online and anytime someone linked to it, it would 
-display YOUR card? (This would never work because someone would just change their 
-card to something mean or gross -- this is a moderation nightmare).
-
-e.g.:
-
-```campfire
-This is %{a link}(^windex).
-```
-
-The `^` character means "remote" link. 
-
-Remote links are registered on a first-come, first-serve basis. No squatting.
-
-If I register `^jesse`, That means that someone grabbing `{^jesse}` would actually
-be getting `{^jesse/home}`. Since I own `^jesse`, I can make any number of other cards 
-in my account, accessible by `{^jesse/card_name}`. 
-
-I can mark cards private. If a user nagivates to one of my private cards OR a 
-card that does not exist, it pulls my 404 card. 
-
 - [Feature] You can include a campfire file in another campfire fire. 
-
-```
-my-proj/
-  start.campfire
-  header.html
-  footer.html
-
-
-```
 
 - [Enhancement] header/footer should just be template.html. When will you want a 
   custom header but not footer? Just have a special tag that MUST exist in the file 
   exactly once, and if that is the case, then it's a valid template. 
   It can literally be the only contents of the file if you want. 
 
-
-- [marketing] Instant "message from" them. You're reading an article and see a link to 
+- [Idea] Instant "message from" them. You're reading an article and see a link to 
 my name. Instead of that link going to another website, it modifies the existing 
 site, showing more information but from the resource itself. 
 
@@ -286,8 +270,7 @@ looking for."
 
   No reason why this can't be a future feature. Just requires a bit of overhaul.
 
-
-  - [Issue] If text exists between a card, the error is not helpful:
+- [Issue] If text exists between a card, the error is not helpful:
 
   thread 'main' panicked at 'unsuccessful parse: Error { variant: ParsingError { positives: [EOI, card], negatives: [] }, location: Pos(771), line_col: Pos((49, 1)), path: None, line: "// Of course, this is only an example!␊", continued_line: None }', src/build/parser.rs:98:10
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
@@ -307,20 +290,18 @@ pub enum CampfireError {
   ...
 };
 
+// Errors should return something helpful
 return campfire_error(CampfireError::InvalidFile, &filename);
-
-
 ```
 
 - [Feature/Bug] When a link is clicked, search the link index for all other links to that card 
   and mark them as clicked.
-  (Perhaps this should be configurable? I can forsee interesting reasons for wanting to be 
+  (Perhaps this should be configurable? I can see interesting reasons for wanting to be 
   able to render the same card many times (for example, when teaching a concept -- instead of 
   scrolling back up, just render the content again?))
 
 - [Enhancement] `plugins/onclick.js` should really be `plugins/link_click.js` because
   what if we wanted to rope in a different onclick event somewhere?
-
 
 - [Enhancement] `campfire build --html_pages` outputs the project in zero javascript --
   all html files linked to one another and the start card as index.html
@@ -359,6 +340,32 @@ any derivative event from a click:
 
 - [Feature; don't be so hard on yourself] (cloned_elements_inserts) What 
 happens when you link to a card that was already linked to? Shouldn't that card come again?
+Perhaps we clone the element so that we can create as many of the cards as there are links to it.
 
-  -- Clone the element so that we can create as many of the cards as there are 
-  links to it.
+- [Expression plugins]
+
+Exploring **expression plugins** for the beta version.
+
+`%{cabin}(go_to_cabin)[some_plugin]`
+
+Each plugin is a function that is automatically injected with a data structure 
+to help you customize Campfire: 
+
+```campfire
+Take me to your %{leader}(go_to_leader)[toggleOnClick;randomBackground]
+```
+
+```typescript
+function toggleOnClick() {
+  window.campfire.getDocument(); // returns an array of all cards
+  window.campfire.getCurrentCard(); // returns the most recently called card as DIV Element
+  window.campfire.getCard(name); // Returns card by name as DIV Element
+  window.campfire.thisLink(); // Returns this link's id as SPAN Element
+}
+```
+
+label: The HTML that gets rendered as the link
+target card: The card the link should action us to
+plugins: semicolon-separated list of plugins.
+
+Extendable via plugins, with many built-in plugins.
