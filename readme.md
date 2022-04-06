@@ -1,3 +1,6 @@
+_This is an experimental project. Stability and backwards compatibility are not
+guaranteed._
+
 # Campfire
 
 This project is a proof-of-concept compiler for the Campfire language. It 
@@ -195,7 +198,7 @@ file will be loaded into a `<style>` block in the head of `index.html`.
 
 To start making plugins, create a `plugins` directory at the root of your project.
 
-## Link click plugin {#onclick-plugin}
+## Link click plugin
 
 You can write your own Javascript to handle the `click` event that is fired off when 
 a Campfire link is clicked. 
